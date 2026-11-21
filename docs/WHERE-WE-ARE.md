@@ -20,7 +20,7 @@ _Last updated: November 21, 2026. This note and the plan are also saved in GitHu
 - [x] Step 9: Approvals (done)
 - [x] Step 10: Services explained (done; Steve: "this all looks good")
 - [x] Step 11: Confirm plan (done; plan + 6 must-haves saved in STEVES-HUB-PLAN.md)
-- [ ] Step 12: Build (in progress: GitHub DONE: account stevesellsorlando, two-step login on, private repo steves-hub created, Claude GitHub App installed on steves-hub only, Claude can save code there. Supabase step 1 done (on sign-up page); step 2 done (signed up with GitHub); on Create organization; gave step 3: name Steve's Hub, type Personal, plan Free, Create organization.)
+- [ ] Step 12: Build (in progress: GitHub DONE: account stevesellsorlando, two-step login on, private repo steves-hub created, Claude GitHub App installed on steves-hub only, Claude can save code there. Supabase step 1 done (on sign-up page); step 2 done (signed up with GitHub); on Create organization; step 3 done (org "Steve's Hub", Personal, Free). On Create project; gave step 4: project name steves-hub + generate + save DB password.)
 
 ## Steve's choices so far
 - Hub name: **Steve's Hub**
@@ -85,6 +85,7 @@ _Last updated: November 21, 2026. This note and the plan are also saved in GitHu
 - FUB features he actually uses: **People list, Tasks, Notes, Tags, Email templates + sending email, Appointments/calendar.** Doesn't use: stages, smart lists, action plans, lead inbox/routing, dialer, texting, pipeline, website tracking, phone app.
 
 ## Accounts set up (never passwords)
+- Supabase: signed up with GitHub; organization **Steve's Hub** (Free plan). Project in progress.
 - GitHub: username **stevesellsorlando**, connected to Claude (app installed on steves-hub only) (account created; private repo **steves-hub**; **two-step login ON** with Google Authenticator; recovery codes downloaded + kept safe by Steve)
 
 ## Very next step
