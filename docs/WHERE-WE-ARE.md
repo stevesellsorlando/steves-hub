@@ -20,7 +20,7 @@ _Last updated: November 21, 2026. This note and the plan are also saved in GitHu
 - [x] Step 9: Approvals (done)
 - [x] Step 10: Services explained (done; Steve: "this all looks good")
 - [x] Step 11: Confirm plan (done; plan + 6 must-haves saved in STEVES-HUB-PLAN.md)
-- [ ] Step 12: Build (in progress: GitHub DONE: account stevesellsorlando, two-step login on, private repo steves-hub created, Claude GitHub App installed on steves-hub only, Claude can save code there. NEXT: Supabase account.)
+- [ ] Step 12: Build (in progress: GitHub DONE: account stevesellsorlando, two-step login on, private repo steves-hub created, Claude GitHub App installed on steves-hub only, Claude can save code there. Supabase step 1 done (on sign-up page); gave step 2: Continue with GitHub + Authorize Supabase.)
 
 ## Steve's choices so far
 - Hub name: **Steve's Hub**
