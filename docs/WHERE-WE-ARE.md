@@ -93,4 +93,5 @@ _Last updated: November 22, 2026. This note and the plan are also saved in GitHu
 - Walk Steve click by click: (1) Supabase SQL Editor (project steves-hub) -> paste supabase/001_starter.sql -> Run -> "ran it". (2) Supabase Authentication > Users > Add user (his email + a new password, Auto Confirm) and turn OFF new sign-ups. (3) Merge PR. (4) Vercel: import steves-hub, add NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (from Supabase Project Settings > API / API Keys), Deploy. (5) Practice with 5-6 made-up people.
 
 ## Where I got stuck
+- Supabase SQL Editor: Steve saw a notice "Snippets no longer save automatically" instead of the empty box I described, and thought he was in the wrong place. (Fix: pending; it IS the SQL Editor, need a new blank query.)
 - GitHub two-step login: the 6-digit code from Google Authenticator kept failing ("verification code failed"), even with a fresh code. **Fix: on iPhone, Settings > General > Date & Time > "Set Automatically" ON, then a fresh code worked.** (Sarah: worth adding this tip before the code step.)
