@@ -20,7 +20,7 @@ _Last updated: November 22, 2026. This note and the plan are also saved in GitHu
 - [x] Step 9: Approvals (done)
 - [x] Step 10: Services explained (done; Steve: "this all looks good")
 - [x] Step 11: Confirm plan (done; plan + 6 must-haves saved in STEVES-HUB-PLAN.md)
-- [ ] Step 12: Build (in progress: GitHub DONE: account stevesellsorlando, two-step login on, private repo steves-hub created, Claude GitHub App installed on steves-hub only, Claude can save code there. Supabase DONE: project **steves-hub** created (East US), signed in with GitHub so GitHub's two-step login protects it. NEXT: Vercel. Vercel DONE: signed up with GitHub, Hobby plan, sitting on "Import Git Repository" (NOT imported yet; import after first code is pushed). ALL 3 ACCOUNTS DONE. Asked: start building now or take a break.)
+- [ ] Step 12: Build (in progress: all 3 accounts DONE. Phase 1 code written on branch phase-1-starter (PR open): sign-in, side menu + phone bar, Last updated, Clients/Probates/Expireds lists, fast after-call screen, person card (notes, Called/Texted, follow-ups, details, Became a client), basic To-Do with type filters, simple Home. SQL: supabase/001_starter.sql. NEXT: Steve runs SQL in Supabase, creates his login user, then merge PR, then import in Vercel + add 2 keys.)
 
 ## Steve's choices so far
 - Hub name: **Steve's Hub**
@@ -90,7 +90,7 @@ _Last updated: November 22, 2026. This note and the plan are also saved in GitHu
 - GitHub: username **stevesellsorlando**, connected to Claude (app installed on steves-hub only) (account created; private repo **steves-hub**; **two-step login ON** with Google Authenticator; recovery codes downloaded + kept safe by Steve)
 
 ## Very next step
-- Build phase 1: Next.js + TypeScript + Tailwind + Supabase (RLS). Sign-in, charcoal+gold side menu with logo, "Last updated" note, Clients / Probates / Expireds + fast after-call screen + follow-ups. Give Steve one SQL file to run in Supabase (project steves-hub). Then import steves-hub in Vercel + add Supabase keys in Vercel settings, click by click.
+- Walk Steve click by click: (1) Supabase SQL Editor (project steves-hub) -> paste supabase/001_starter.sql -> Run -> "ran it". (2) Supabase Authentication > Users > Add user (his email + a new password, Auto Confirm) and turn OFF new sign-ups. (3) Merge PR. (4) Vercel: import steves-hub, add NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (from Supabase Project Settings > API / API Keys), Deploy. (5) Practice with 5-6 made-up people.
 
 ## Where I got stuck
 - GitHub two-step login: the 6-digit code from Google Authenticator kept failing ("verification code failed"), even with a fresh code. **Fix: on iPhone, Settings > General > Date & Time > "Set Automatically" ON, then a fresh code worked.** (Sarah: worth adding this tip before the code step.)
