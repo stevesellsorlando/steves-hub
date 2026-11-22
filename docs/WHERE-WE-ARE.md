@@ -20,7 +20,7 @@ _Last updated: November 22, 2026. This note and the plan are also saved in GitHu
 - [x] Step 9: Approvals (done)
 - [x] Step 10: Services explained (done; Steve: "this all looks good")
 - [x] Step 11: Confirm plan (done; plan + 6 must-haves saved in STEVES-HUB-PLAN.md)
-- [ ] Step 12: Build (in progress: GitHub DONE: account stevesellsorlando, two-step login on, private repo steves-hub created, Claude GitHub App installed on steves-hub only, Claude can save code there. Supabase DONE: project **steves-hub** created (East US), signed in with GitHub so GitHub's two-step login protects it. NEXT: Vercel. Vercel step 1 done (on signup page); gave step 2: Hobby, name, Continue, Continue with GitHub, Authorize Vercel.)
+- [ ] Step 12: Build (in progress: GitHub DONE: account stevesellsorlando, two-step login on, private repo steves-hub created, Claude GitHub App installed on steves-hub only, Claude can save code there. Supabase DONE: project **steves-hub** created (East US), signed in with GitHub so GitHub's two-step login protects it. NEXT: Vercel. Vercel DONE: signed up with GitHub, Hobby plan, sitting on "Import Git Repository" (NOT imported yet; import after first code is pushed). ALL 3 ACCOUNTS DONE. Asked: start building now or take a break.)
 
 ## Steve's choices so far
 - Hub name: **Steve's Hub**
@@ -85,11 +85,12 @@ _Last updated: November 22, 2026. This note and the plan are also saved in GitHu
 - FUB features he actually uses: **People list, Tasks, Notes, Tags, Email templates + sending email, Appointments/calendar.** Doesn't use: stages, smart lists, action plans, lead inbox/routing, dialer, texting, pipeline, website tracking, phone app.
 
 ## Accounts set up (never passwords)
+- Vercel: signed up with GitHub (protected by GitHub two-step login), **Hobby** plan. Project not imported yet.
 - Supabase: signed up with GitHub (protected by GitHub two-step login); organization **Steve's Hub** (Free plan); project **steves-hub** (East US). DB password saved by Steve (not here). Move to Pro ($25) before real clients go in.
 - GitHub: username **stevesellsorlando**, connected to Claude (app installed on steves-hub only) (account created; private repo **steves-hub**; **two-step login ON** with Google Authenticator; recovery codes downloaded + kept safe by Steve)
 
 ## Very next step
-- Vercel: sign up with GitHub (Hobby plan for now), name: Steve. Two-step login protected via GitHub. Then build phase 1 (sign-in, side menu, Clients/Probates/Expireds + after-call screen), with SQL file for Steve to run in Supabase SQL editor (project steves-hub).
+- Build phase 1: Next.js + TypeScript + Tailwind + Supabase (RLS). Sign-in, charcoal+gold side menu with logo, "Last updated" note, Clients / Probates / Expireds + fast after-call screen + follow-ups. Give Steve one SQL file to run in Supabase (project steves-hub). Then import steves-hub in Vercel + add Supabase keys in Vercel settings, click by click.
 
 ## Where I got stuck
 - GitHub two-step login: the 6-digit code from Google Authenticator kept failing ("verification code failed"), even with a fresh code. **Fix: on iPhone, Settings > General > Date & Time > "Set Automatically" ON, then a fresh code worked.** (Sarah: worth adding this tip before the code step.)
