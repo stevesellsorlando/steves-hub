@@ -1,0 +1,30 @@
+import Link from "next/link";
+import { completeTask } from "@/app/actions";
+import { SubmitButton } from "./SubmitButton";
+import { dueLabel, todayISO } from "@/lib/dates";
+import type { Task } from "@/lib/types";
+
+export function TaskRow({ t }: { t: Task }) {
+  const overdue = t.due_date < todayISO();
+  return (
+    <li className="flex items-center gap-3 border-b border-stone-100 px-5 py-3 last:border-0">
+      <form action={completeTask.bind(null, t.id)}>
+        <SubmitButton className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-stone-300 text-transparent hover:border-gold hover:text-gold" pendingText="✓">
+          ✓
+        </SubmitButton>
+      </form>
+      <div className="min-w-0 flex-1">
+        {t.person_id && t.people ? (
+          <Link href={`/people/${t.person_id}`} className="font-medium hover:text-gold-dark">{t.title}</Link>
+        ) : (
+          <p className="font-medium">{t.title}</p>
+        )}
+        <p className="text-sm text-stone-500">
+          <span className={overdue ? "text-red-600" : ""}>{dueLabel(t.due_date)}</span>
+          {t.people?.phone && <> · <a href={`tel:${t.people.phone}`} className="hover:text-gold-dark">📞 {t.people.phone}</a></>}
+        </p>
+      </div>
+      <span className="chip border-stone-200 bg-stone-50 text-xs">{t.type}</span>
+    </li>
+  );
+}
