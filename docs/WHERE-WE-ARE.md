@@ -20,7 +20,7 @@ _Last updated: November 22, 2026. This note and the plan are also saved in GitHu
 - [x] Step 9: Approvals (done)
 - [x] Step 10: Services explained (done; Steve: "this all looks good")
 - [x] Step 11: Confirm plan (done; plan + 6 must-haves saved in STEVES-HUB-PLAN.md)
-- [ ] Step 12: Build (in progress: all 3 accounts DONE. Phase 1 code written on branch phase-1-starter (PR open): sign-in, side menu + phone bar, Last updated, Clients/Probates/Expireds lists, fast after-call screen, person card (notes, Called/Texted, follow-ups, details, Became a client), basic To-Do with type filters, simple Home. SQL: supabase/001_starter.sql. DONE: Steve ran supabase/001_starter.sql in steves-hub (Success). NEXT: creates his login user (gave step: Authentication > Users), then merge PR, then import in Vercel + add 2 keys.)
+- [ ] Step 12: Build (in progress: all 3 accounts DONE. Phase 1 code written on branch phase-1-starter (PR open): sign-in, side menu + phone bar, Last updated, Clients/Probates/Expireds lists, fast after-call screen, person card (notes, Called/Texted, follow-ups, details, Became a client), basic To-Do with type filters, simple Home. SQL: supabase/001_starter.sql. DONE: Steve ran supabase/001_starter.sql in steves-hub (Success). NEXT: creates his login user (on Users page; gave step: Add user > Create new user, email + new password, Auto Confirm), then merge PR, then import in Vercel + add 2 keys.)
 
 ## Steve's choices so far
 - Hub name: **Steve's Hub**
