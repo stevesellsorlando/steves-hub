@@ -1,6 +1,6 @@
 # Where We Are: Steve's Real Estate Hub
 
-_Last updated: November 21, 2026. This note and the plan are also saved in GitHub: steves-hub/docs/_
+_Last updated: November 22, 2026. This note and the plan are also saved in GitHub: steves-hub/docs/_
 
 ## About Steve
 - Name: Steve
@@ -20,7 +20,7 @@ _Last updated: November 21, 2026. This note and the plan are also saved in GitHu
 - [x] Step 9: Approvals (done)
 - [x] Step 10: Services explained (done; Steve: "this all looks good")
 - [x] Step 11: Confirm plan (done; plan + 6 must-haves saved in STEVES-HUB-PLAN.md)
-- [ ] Step 12: Build (in progress: GitHub DONE: account stevesellsorlando, two-step login on, private repo steves-hub created, Claude GitHub App installed on steves-hub only, Claude can save code there. Supabase DONE: project **steves-hub** created (East US), signed in with GitHub so GitHub's two-step login protects it. NEXT: Vercel. Gave Vercel step 1: open vercel.com/signup.)
+- [ ] Step 12: Build (in progress: GitHub DONE: account stevesellsorlando, two-step login on, private repo steves-hub created, Claude GitHub App installed on steves-hub only, Claude can save code there. Supabase DONE: project **steves-hub** created (East US), signed in with GitHub so GitHub's two-step login protects it. NEXT: Vercel. Vercel step 1 done (on signup page); gave step 2: Hobby, name, Continue, Continue with GitHub, Authorize Vercel.)
 
 ## Steve's choices so far
 - Hub name: **Steve's Hub**
