@@ -57,6 +57,7 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
             <div>
               <label className="label" htmlFor="stage-top">Stage</label>
               <select id="stage-top" name="stage" defaultValue={person.stage ?? ""} className="input py-2">
+                {person.stage && !stagesFor(person.list).includes(person.stage) && <option>{person.stage}</option>}
                 {stagesFor(person.list).map((s) => <option key={s}>{s}</option>)}
               </select>
             </div>

@@ -13,6 +13,7 @@ function F({ f, p }: { f: Field; p: Person }) {
       {f.options ? (
         <select id={`d-${f.name}`} name={f.name} defaultValue={value} className="input">
           <option value="">—</option>
+          {value && !f.options.includes(value) && <option>{value}</option>}
           {f.options.map((o) => <option key={o}>{o}</option>)}
         </select>
       ) : (

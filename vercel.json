@@ -1,0 +1,3 @@
+{
+  "crons": [{ "path": "/api/fub/sync", "schedule": "0 10 * * *" }]
+}
