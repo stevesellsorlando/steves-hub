@@ -53,7 +53,7 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
               </div>
             )}
           </div>
-          <form action={setStage.bind(null, person.id)} className="flex items-end gap-2">
+          <form key={person.stage ?? ""} action={setStage.bind(null, person.id)} className="flex items-end gap-2">
             <div>
               <label className="label" htmlFor="stage-top">Stage</label>
               <select id="stage-top" name="stage" defaultValue={person.stage ?? ""} className="input py-2">
@@ -137,7 +137,7 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
         )}
       </div>
 
-      <DetailsForm person={person} />
+      <DetailsForm key={JSON.stringify(person)} person={person} />
 
       <form action={deletePerson.bind(null, person.id, person.list)} className="pb-4 text-right">
         <ConfirmButton className="text-sm text-red-600 underline" message={`Delete ${person.name} and all their notes and follow-ups? This can't be undone.`}>
