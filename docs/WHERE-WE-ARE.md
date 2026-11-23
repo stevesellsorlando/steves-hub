@@ -25,7 +25,7 @@ _Last updated: November 23, 2026. This note and the plan are also saved in GitHu
 ## Add-on: Connections (started Nov 23, 2026)
 Checklist:
 - [ ] 1. Import from Follow Up Boss (not done: no import yet)
-- [ ] 2. Follow Up Boss: **B) stay connected** (chosen Nov 23). One-way FUB -> hub. Asking: is Steve the FUB account owner (webhooks) or not (daily catch-up)?
+- [ ] 2. Follow Up Boss: **B) stay connected** (chosen Nov 23). One-way FUB -> hub. Steve is NOT the FUB owner (team/brokerage owns it) -> no webhooks; scheduled catch-up. His API key will only see his own people. Asked how often to sync.
 - [ ] 3. Email: Google Workspace, own domain (not connected yet)
 - [ ] 4. Spam check: SPF / DKIM / DMARC (not checked yet)
 - [ ] 5. Calendar: Google Calendar (not connected yet)
