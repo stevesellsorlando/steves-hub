@@ -4,21 +4,31 @@ import { LISTS, stagesFor, type ListKey } from "@/lib/constants";
 import { dueLabel, todayISO } from "@/lib/dates";
 import type { Person } from "@/lib/types";
 
-export async function PeopleList({ list, q, stage }: { list: ListKey; q?: string; stage?: string }) {
+const PAGE_SIZE = 100;
+
+export async function PeopleList({ list, q, stage, page = 1 }: { list: ListKey; q?: string; stage?: string; page?: number }) {
   const supabase = await createClient();
   const meta = LISTS[list];
 
+  // Searching looks through all three lists, so nobody hides on the "wrong" list.
+  const searchAll = Boolean(q);
+  const from = (Math.max(page, 1) - 1) * PAGE_SIZE;
   let query = supabase
     .from("people")
-    .select("id, name, stage, phone, property_address, address, tags")
-    .eq("list", list)
-    .order("name");
-  if (stage) query = query.eq("stage", stage);
+    .select("id, name, stage, phone, property_address, address, tags, list", { count: "exact" })
+    .order("name")
+    .order("id")
+    .range(from, from + PAGE_SIZE - 1);
+  if (!searchAll) query = query.eq("list", list);
+  if (stage && !searchAll) query = query.eq("stage", stage);
   if (q) {
     const safe = q.replace(/[%,()]/g, " ");
     query = query.or(`name.ilike.%${safe}%,phone.ilike.%${safe}%,property_address.ilike.%${safe}%,address.ilike.%${safe}%`);
   }
-  const { data: people } = await query.returns<Pick<Person, "id" | "name" | "stage" | "phone" | "property_address" | "address" | "tags">[]>();
+  const { data: people, count } = await query.returns<Pick<Person, "id" | "name" | "stage" | "phone" | "property_address" | "address" | "tags" | "list">[]>();
+  const total = count ?? people?.length ?? 0;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const pageHref = (n: number) => `${meta.path}?page=${n}${stage ? `&stage=${encodeURIComponent(stage)}` : ""}${q ? `&q=${encodeURIComponent(q)}` : ""}`;
 
   const ids = (people ?? []).map((p) => p.id);
   const nextDue = new Map<string, string>();
@@ -45,7 +55,7 @@ export async function PeopleList({ list, q, stage }: { list: ListKey; q?: string
 
       <form className="mb-4 flex gap-2">
         {stage && <input type="hidden" name="stage" value={stage} />}
-        <input name="q" defaultValue={q} placeholder="Search by name, phone or address" className="input" />
+        <input name="q" defaultValue={q} placeholder="Search everyone (all lists) by name, phone or address" className="input" />
         <button className="btn-dark">Search</button>
       </form>
 
@@ -85,6 +95,7 @@ export async function PeopleList({ list, q, stage }: { list: ListKey; q?: string
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 text-sm">
+                  {searchAll && <span className="chip border-gold/40 bg-amber-50 text-gold-dark">{LISTS[p.list].one}</span>}
                   {p.stage && <span className="chip border-stone-200 bg-stone-50">{p.stage}</span>}
                   {due ? (
                     <span className={`chip ${due < today ? "border-red-200 bg-red-50 text-red-700" : due === today ? "border-gold bg-amber-50" : "border-stone-200"}`}>
@@ -99,7 +110,20 @@ export async function PeopleList({ list, q, stage }: { list: ListKey; q?: string
           })}
         </div>
       )}
-      <p className="mt-3 text-sm text-stone-500">{people?.length ?? 0} {people?.length === 1 ? "person" : "people"}</p>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-stone-500">
+        <p>
+          {total} {total === 1 ? "person" : "people"}
+          {searchAll ? " found across all lists" : ""}
+          {pages > 1 ? ` · showing ${from + 1}–${Math.min(from + PAGE_SIZE, total)}` : ""}
+        </p>
+        {pages > 1 && (
+          <div className="flex items-center gap-2">
+            {page > 1 && <Link href={pageHref(page - 1)} className="btn-light py-2">← Previous</Link>}
+            <span>Page {page} of {pages}</span>
+            {page < pages && <Link href={pageHref(page + 1)} className="btn-light py-2">Next →</Link>}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

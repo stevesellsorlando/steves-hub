@@ -24,12 +24,19 @@ export type SyncResult = { total: number; created: number; updated: number; unch
 export async function syncFromFub(supabase: SupabaseClient, userId: string, people?: FubPerson[]): Promise<SyncResult> {
   const fubPeople = people ?? (await fetchAllPeople());
 
-  const { data: existingRows, error } = await supabase
-    .from("people")
-    .select("id, fub_id, fub_stage, list, name, phone, phone2, email, email2, address, tags, lead_source")
-    .eq("user_id", userId);
-  if (error) throw new Error(error.message);
-  const existing = (existingRows ?? []) as Existing[];
+  // Read everyone already in the hub, 1,000 at a time (Supabase returns at most 1,000 per request).
+  const existing: Existing[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data: rows, error } = await supabase
+      .from("people")
+      .select("id, fub_id, fub_stage, list, name, phone, phone2, email, email2, address, tags, lead_source")
+      .eq("user_id", userId)
+      .order("id")
+      .range(from, from + 999);
+    if (error) throw new Error(error.message);
+    existing.push(...((rows ?? []) as Existing[]));
+    if (!rows || rows.length < 1000) break;
+  }
 
   const byFub = new Map<number, Existing>();
   const byEmail = new Map<string, Existing>();
