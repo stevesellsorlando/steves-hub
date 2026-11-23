@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { addTask } from "@/app/actions";
 import { TaskRow } from "@/components/TaskRow";
+import { OkBanner } from "@/components/OkBanner";
 import { SubmitButton } from "@/components/SubmitButton";
 import { TASK_TYPES } from "@/lib/constants";
 import { addDaysISO, todayISO } from "@/lib/dates";
@@ -26,6 +27,7 @@ export default async function TodoPage({ searchParams }: { searchParams: Promise
   return (
     <div>
       <h1 className="h1 mb-5">To-Do</h1>
+      <div className="mb-5"><OkBanner /></div>
 
       <div className="mb-5 flex flex-wrap gap-2">
         <Link href="/todo" className={`chip ${!type ? "border-gold bg-gold text-charcoal" : "border-stone-300 bg-white"}`}>All</Link>

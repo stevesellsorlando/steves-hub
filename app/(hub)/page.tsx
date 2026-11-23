@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { TaskRow } from "@/components/TaskRow";
+import { OkBanner } from "@/components/OkBanner";
 import { TZ, todayISO } from "@/lib/dates";
 import type { Task } from "@/lib/types";
 
@@ -25,6 +26,8 @@ export default async function Home() {
         <h1 className="h1">{hello}, Steve</h1>
         <p className="text-stone-500">{dateLine}</p>
       </div>
+
+      <OkBanner />
 
       <div className="grid gap-3 sm:grid-cols-3">
         <Link href="/people/new?list=probate" className="btn-gold py-4">📜 Log a probate call</Link>
