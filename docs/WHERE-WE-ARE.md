@@ -25,7 +25,7 @@ _Last updated: November 23, 2026. This note and the plan are also saved in GitHu
 ## Add-on: Connections (started Nov 23, 2026)
 Checklist:
 - [ ] 1. Import from Follow Up Boss (not done: no import yet)
-- [ ] 2. Follow Up Boss: **B) stay connected** (chosen Nov 23). One-way FUB -> hub. Steve is NOT the FUB owner (team/brokerage owns it) -> no webhooks. Sync: **once a day, free** (Vercel cron ~6am ET) + "Sync now" button. Code built on branch fub-connection (PR #2): Settings page, preview of mapping before import, matching by FUB id > email > phone, daily catch-up at /api/fub/sync. Needs: SQL 002, register system "StevesHub", FUB API key, 4 Vercel keys (FUB_API_KEY, FUB_SYSTEM_KEY, SUPABASE_SECRET_KEY, CRON_SECRET), merge + redeploy. Import will be done through the connection (no CSV).
+- [ ] 2. Follow Up Boss: **B) stay connected** (chosen Nov 23). One-way FUB -> hub. Steve is NOT the FUB owner (team/brokerage owns it) -> no webhooks. Sync: **once a day, free** (Vercel cron ~6am ET) + "Sync now" button. Code built on branch fub-connection (PR #2): Settings page, preview of mapping before import, matching by FUB id > email > phone, daily catch-up at /api/fub/sync. Needs: SQL 002, register system "StevesHub", FUB API key, 4 Vercel keys (FUB_API_KEY, FUB_SYSTEM_KEY, SUPABASE_SECRET_KEY, CRON_SECRET), merge + redeploy. Import will be done through the connection (no CSV). Supabase: Steve chose **stay on Free for now** (upgrade to Pro once using daily). NOW: run SQL 002 (direct link supabase.com/dashboard/project/osdejrycflulqrgcxtpk/sql/new).
 - [ ] 3. Email: Google Workspace, own domain (not connected yet)
 - [ ] 4. Spam check: SPF / DKIM / DMARC (not checked yet)
 - [ ] 5. Calendar: Google Calendar (not connected yet)
