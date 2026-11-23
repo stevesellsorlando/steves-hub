@@ -90,12 +90,14 @@ export async function addFubNote(fubPersonId: number, body: string) {
 export type FubNote = { id: number; subject?: string; body?: string; isHtml?: boolean | number; created?: string };
 export type FubCall = { id: number; note?: string; outcome?: string; duration?: number; isIncoming?: boolean | number; created?: string };
 
-async function allPages<T>(firstUrl: string, key: string, max = 1000): Promise<T[]> {
+async function allPages<T>(firstUrl: string, keys: string | string[], max = 1000): Promise<T[]> {
+  const keyList = Array.isArray(keys) ? keys : [keys];
   const out: T[] = [];
   let url: string | null = firstUrl;
   while (url && out.length < max) {
     const page: any = await fubFetch(url);
-    const batch: T[] = page[key] ?? [];
+    const found = keyList.find((k) => Array.isArray(page[k]));
+    const batch: T[] = found ? page[found] : [];
     out.push(...batch);
     const meta = page._metadata ?? {};
     url = batch.length && meta.nextLink ? meta.nextLink : null;
@@ -109,4 +111,15 @@ export function fetchNotes(personId: number) {
 
 export function fetchCalls(personId: number) {
   return allPages<FubCall>(`${BASE}/calls?personId=${personId}&limit=100`, "calls");
+}
+
+export type FubText = { id: number; message?: string; isIncoming?: boolean | number; created?: string };
+export type FubEvent = { id: number; type?: string; message?: string; description?: string; source?: string; created?: string; property?: { street?: string; city?: string } };
+
+export function fetchTexts(personId: number) {
+  return allPages<FubText>(`${BASE}/textMessages?personId=${personId}&limit=100`, ["textmessages", "textMessages"]);
+}
+
+export function fetchEvents(personId: number) {
+  return allPages<FubEvent>(`${BASE}/events?personId=${personId}&limit=100`, "events");
 }
