@@ -1,6 +1,6 @@
 # Where We Are: Steve's Real Estate Hub
 
-_Last updated: November 22, 2026. This note and the plan are also saved in GitHub: steves-hub/docs/_
+_Last updated: November 23, 2026. This note and the plan are also saved in GitHub: steves-hub/docs/_
 
 ## About Steve
 - Name: Steve
@@ -20,7 +20,15 @@ _Last updated: November 22, 2026. This note and the plan are also saved in GitHu
 - [x] Step 9: Approvals (done)
 - [x] Step 10: Services explained (done; Steve: "this all looks good")
 - [x] Step 11: Confirm plan (done; plan + 6 must-haves saved in STEVES-HUB-PLAN.md)
-- [ ] Step 12: Build (in progress: all 3 accounts DONE. Phase 1 code written on branch phase-1-starter (PR open): sign-in, side menu + phone bar, Last updated, Clients/Probates/Expireds lists, fast after-call screen, person card (notes, Called/Texted, follow-ups, details, Became a client), basic To-Do with type filters, simple Home. SQL: supabase/001_starter.sql. DONE: Steve ran supabase/001_starter.sql in steves-hub (Success). NEXT: creates his login user DONE: his hub login user created (password saved by Steve). New sign-ups turned OFF. PR #1 MERGED into main (Steve OK'd). NOW: Vercel import (Vercel import page open, NOT deployed yet; URL copied, Env Variables boxes open; key 1 NEXT_PUBLIC_SUPABASE_URL filled in Vercel. key 1 trimmed to https://<ref>.supabase.co. On API Keys page (default publishable key visible); screenshot showed only ONE row, with the URL typed in the Key box and the publishable key in Value (red error). DEPLOYED to Vercel production in 54 seconds; sign-in page live. NOW: Steve clicks Visit and signs in with his hub login; ask him for the web address), then merge PR, then import in Vercel + add 2 keys.)
+- [ ] Step 12: Build (in progress). Phase 1 starter hub is LIVE on Vercel: sign-in, side menu + phone bar, Last updated, Clients / Probates / Expireds, fast after-call screen, person card (notes, Called/Texted, follow-ups, details, Became a client), basic To-Do with type filters, simple Home. Supabase: 001_starter.sql run, Steve's login user created, new sign-ups OFF. PR #1 merged. STILL TO CONFIRM: Steve signed in OK + his hub's web address (…vercel.app). Practice with made-up people not done yet.
+
+## Add-on: Connections (started Nov 23, 2026)
+Checklist:
+- [ ] 1. Import from Follow Up Boss (not done: no import yet)
+- [ ] 2. Follow Up Boss: import only (A) or live connection (B)? (asked)
+- [ ] 3. Email: Google Workspace, own domain (not connected yet)
+- [ ] 4. Spam check: SPF / DKIM / DMARC (not checked yet)
+- [ ] 5. Calendar: Google Calendar (not connected yet)
 
 ## Steve's choices so far
 - Hub name: **Steve's Hub**
@@ -91,7 +99,7 @@ _Last updated: November 22, 2026. This note and the plan are also saved in GitHu
 - GitHub: username **stevesellsorlando**, connected to Claude (app installed on steves-hub only) (account created; private repo **steves-hub**; **two-step login ON** with Google Authenticator; recovery codes downloaded + kept safe by Steve)
 
 ## Very next step
-- Walk Steve click by click: (1) Supabase SQL Editor (project steves-hub) -> paste supabase/001_starter.sql -> Run -> "ran it". (2) Supabase Authentication > Users > Add user (his email + a new password, Auto Confirm) and turn OFF new sign-ups. (3) Merge PR. (4) Vercel: import steves-hub, add NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (from Supabase Project Settings > API / API Keys), Deploy. (5) Practice with 5-6 made-up people.
+- Add-on Part 1: Steve picks A (import once) or B (stay connected to FUB). Then confirm he can sign in to the hub + get web address, then the import.
 
 ## Where I got stuck
 - Vercel environment variables: the Key and Value boxes got mixed up (the address went into the Key box), and only one row existed. Vercel showed a red "invalid" error. **Fix: renamed that row's Key, then "+ Add More" for the URL as its own row, giving Key and Value one at a time.** (Sarah: show a picture of what the two rows should look like.) Also the final button says "Create Project," not "Deploy."
