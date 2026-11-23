@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { syncNow } from "@/app/fubActions";
 import { SubmitButton } from "@/components/SubmitButton";
 import { prettyDateTime } from "@/lib/dates";
+import { NotesImporter } from "@/components/NotesImporter";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -20,6 +21,10 @@ export default async function Settings({ searchParams }: { searchParams: Promise
   const { data: s } = await supabase.from("app_settings").select("*").maybeSingle();
   const have = Object.fromEntries(KEYS.map((k) => [k.name, Boolean(process.env[k.name])]));
   const ready = have.FUB_API_KEY && have.FUB_SYSTEM_KEY;
+  const [{ count: linked }, { count: waiting }] = await Promise.all([
+    supabase.from("people").select("id", { count: "exact", head: true }).not("fub_id", "is", null),
+    supabase.from("people").select("id", { count: "exact", head: true }).not("fub_id", "is", null).is("fub_notes_synced_at", null),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -62,6 +67,16 @@ export default async function Settings({ searchParams }: { searchParams: Promise
           <p className="rounded-xl bg-stone-50 px-4 py-3 text-stone-600">Add the two Follow Up Boss keys in Vercel to turn this on.</p>
         )}
       </section>
+
+      {ready && s?.fub_sync_enabled && (
+        <section className="card space-y-3">
+          <h2 className="text-lg font-bold">📝 Notes from Follow Up Boss</h2>
+          <p className="text-stone-600">
+            Copies each person&apos;s notes and call logs onto their timeline, with the original dates. New notes come over each morning on their own.
+          </p>
+          <NotesImporter waiting={waiting ?? 0} total={linked ?? 0} />
+        </section>
+      )}
     </div>
   );
 }

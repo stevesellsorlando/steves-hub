@@ -17,6 +17,8 @@ type Existing = {
   address: string | null;
   tags: string[] | null;
   lead_source: string | null;
+  fub_last_activity: string | null;
+  fub_notes_synced_at: string | null;
 };
 
 export type SyncResult = { total: number; created: number; updated: number; unchanged: number };
@@ -29,7 +31,7 @@ export async function syncFromFub(supabase: SupabaseClient, userId: string, peop
   for (let from = 0; ; from += 1000) {
     const { data: rows, error } = await supabase
       .from("people")
-      .select("id, fub_id, fub_stage, list, name, phone, phone2, email, email2, address, tags, lead_source")
+      .select("id, fub_id, fub_stage, list, name, phone, phone2, email, email2, address, tags, lead_source, fub_last_activity, fub_notes_synced_at")
       .eq("user_id", userId)
       .order("id")
       .range(from, from + 999);
@@ -74,6 +76,7 @@ export async function syncFromFub(supabase: SupabaseClient, userId: string, peop
         fub_id: p.id,
         fub_stage: p.stage ?? null,
         fub_updated_at: p.updated ?? null,
+        fub_last_activity: p.lastActivity ?? null,
         ...f,
       });
       if (p.background?.trim()) notes.push({ fubId: p.id, body: `From Follow Up Boss: ${p.background.trim()}` });
@@ -101,11 +104,18 @@ export async function syncFromFub(supabase: SupabaseClient, userId: string, peop
       patch.fub_stage = p.stage ?? null;
       patch.stage = mapStage(p.stage, match.list as never);
     }
+    const changed = Object.keys(patch).length > 0;
+    // New activity in Follow Up Boss (like a new note or call)? Queue this person's notes to be brought over again.
+    if (p.lastActivity && (!match.fub_last_activity || new Date(p.lastActivity) > new Date(match.fub_last_activity))) {
+      patch.fub_last_activity = p.lastActivity;
+      if (match.fub_notes_synced_at && new Date(p.lastActivity) > new Date(match.fub_notes_synced_at)) patch.fub_notes_synced_at = null;
+    }
     if (Object.keys(patch).length) {
-      patch.fub_updated_at = p.updated ?? null;
+      if (changed) patch.fub_updated_at = p.updated ?? null;
       const { error: upErr } = await supabase.from("people").update(patch).eq("id", match.id).eq("user_id", userId);
       if (upErr) throw new Error(upErr.message);
-      result.updated++;
+      if (changed) result.updated++;
+      else result.unchanged++;
     } else result.unchanged++;
   }
 

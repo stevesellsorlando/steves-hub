@@ -60,6 +60,7 @@ export type FubPerson = {
   background?: string;
   updated?: string;
   created?: string;
+  lastActivity?: string;
 };
 
 type PeoplePage = { _metadata?: { next?: string | null; nextLink?: string | null }; people?: FubPerson[] };
@@ -84,4 +85,28 @@ export async function fetchAllPeople(max = 20000): Promise<FubPerson[]> {
 // Optional extra (not turned on yet): copy a hub note to the person's Follow Up Boss timeline
 export async function addFubNote(fubPersonId: number, body: string) {
   return fubFetch("/notes", { method: "POST", body: JSON.stringify({ personId: fubPersonId, subject: "From Steve's Hub", body }) });
+}
+
+export type FubNote = { id: number; subject?: string; body?: string; isHtml?: boolean | number; created?: string };
+export type FubCall = { id: number; note?: string; outcome?: string; duration?: number; isIncoming?: boolean | number; created?: string };
+
+async function allPages<T>(firstUrl: string, key: string, max = 1000): Promise<T[]> {
+  const out: T[] = [];
+  let url: string | null = firstUrl;
+  while (url && out.length < max) {
+    const page: any = await fubFetch(url);
+    const batch: T[] = page[key] ?? [];
+    out.push(...batch);
+    const meta = page._metadata ?? {};
+    url = batch.length && meta.nextLink ? meta.nextLink : null;
+  }
+  return out;
+}
+
+export function fetchNotes(personId: number) {
+  return allPages<FubNote>(`${BASE}/notes?personId=${personId}&limit=100`, "notes");
+}
+
+export function fetchCalls(personId: number) {
+  return allPages<FubCall>(`${BASE}/calls?personId=${personId}&limit=100`, "calls");
 }
