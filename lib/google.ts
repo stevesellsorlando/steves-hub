@@ -11,8 +11,27 @@ export const GOOGLE_SCOPES = [
   "https://www.googleapis.com/auth/calendar.readonly",
 ];
 
+// Trimmed, so a stray space or line break from copying can't break sign-in
+const CLIENT_ID = () => (process.env.GOOGLE_CLIENT_ID ?? "").trim();
+const CLIENT_SECRET = () => (process.env.GOOGLE_CLIENT_SECRET ?? "").trim();
+
 export function googleConfigured() {
-  return Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+  return Boolean(CLIENT_ID() && CLIENT_SECRET());
+}
+
+// A safe peek at the keys (never the whole secret), to spot copy-and-paste mix-ups
+export function googleKeyCheck() {
+  const id = CLIENT_ID();
+  const secret = CLIENT_SECRET();
+  const raw = process.env.GOOGLE_CLIENT_SECRET ?? "";
+  return {
+    idLooksRight: id.endsWith(".apps.googleusercontent.com"),
+    idEnd: id.slice(-30),
+    secretStart: secret.slice(0, 7),
+    secretEnd: secret.slice(-4),
+    secretLength: secret.length,
+    hadExtraSpaces: raw.length !== secret.length,
+  };
 }
 
 export function redirectUri(origin: string) {
@@ -21,7 +40,7 @@ export function redirectUri(origin: string) {
 
 export function authUrl(origin: string, state: string) {
   const p = new URLSearchParams({
-    client_id: process.env.GOOGLE_CLIENT_ID!,
+    client_id: CLIENT_ID(),
     redirect_uri: redirectUri(origin),
     response_type: "code",
     scope: GOOGLE_SCOPES.join(" "),
@@ -41,8 +60,8 @@ export async function exchangeCode(code: string, origin: string): Promise<TokenR
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       code,
-      client_id: process.env.GOOGLE_CLIENT_ID!,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+      client_id: CLIENT_ID(),
+      client_secret: CLIENT_SECRET(),
       redirect_uri: redirectUri(origin),
       grant_type: "authorization_code",
     }),
@@ -67,8 +86,8 @@ export async function accessToken(supabase: SupabaseClient, userId: string): Pro
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      client_id: process.env.GOOGLE_CLIENT_ID!,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+      client_id: CLIENT_ID(),
+      client_secret: CLIENT_SECRET(),
       refresh_token: g.refresh_token,
       grant_type: "refresh_token",
     }),
