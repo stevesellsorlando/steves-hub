@@ -5,7 +5,7 @@ import { SubmitButton } from "@/components/SubmitButton";
 import { prettyDateTime } from "@/lib/dates";
 import { NotesImporter } from "@/components/NotesImporter";
 import { notesWaiting } from "@/lib/fubNotes";
-import { googleConfigured } from "@/lib/google";
+import { googleConfigured, googleKeyCheck } from "@/lib/google";
 import { testEmailToMe } from "@/app/emailActions";
 
 export const maxDuration = 60;
@@ -113,8 +113,25 @@ async function GoogleCard() {
         <>
           <p className="text-stone-600">Connect your Google account so emails you approve send from your real address, and so your hub can use your calendar.</p>
           <a href="/api/google/start" className="btn-gold">Connect Google</a>
+          <KeyCheck />
         </>
       )}
     </section>
+  );
+}
+
+function KeyCheck() {
+  const k = googleKeyCheck();
+  return (
+    <details className="rounded-xl bg-stone-50 px-4 py-3 text-sm text-stone-600">
+      <summary className="cursor-pointer font-semibold">Key check (for troubleshooting)</summary>
+      <ul className="mt-2 space-y-1">
+        <li>{k.idLooksRight ? "✅" : "⚠️"} Client ID ends with: …{k.idEnd}</li>
+        <li>
+          {k.secretStart === "GOCSPX-" ? "✅" : "⚠️"} Client secret starts with “{k.secretStart}”, ends with “{k.secretEnd}”, {k.secretLength} characters long
+          {k.hadExtraSpaces ? " (extra spaces removed)" : ""}
+        </li>
+      </ul>
+    </details>
   );
 }
