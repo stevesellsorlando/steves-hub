@@ -25,7 +25,7 @@ _Last updated: November 23, 2026. This note and the plan are also saved in GitHu
 ## Add-on: Connections (started Nov 23, 2026)
 Checklist:
 - [ ] 1. Import from Follow Up Boss (not done: no import yet)
-- [ ] 2. Follow Up Boss: **B) stay connected** (chosen Nov 23). One-way FUB -> hub. Steve is NOT the FUB owner (team/brokerage owns it) -> no webhooks. Sync: **once a day, free** (Vercel cron ~6am ET) + "Sync now" button. Code built on branch fub-connection (PR #2): Settings page, preview of mapping before import, matching by FUB id > email > phone, daily catch-up at /api/fub/sync. Needs: SQL 002, register system "StevesHub", FUB API key, 4 Vercel keys (FUB_API_KEY, FUB_SYSTEM_KEY, SUPABASE_SECRET_KEY, CRON_SECRET), merge + redeploy. Import will be done through the connection (no CSV). Supabase: Steve chose **stay on Free for now** (upgrade to Pro once using daily). NOW: run SQL 002 (direct link supabase.com/dashboard/project/osdejrycflulqrgcxtpk/sql/new).
+- [ ] 2. Follow Up Boss: **B) stay connected** (chosen Nov 23). One-way FUB -> hub. Steve is NOT the FUB owner (team/brokerage owns it) -> no webhooks. Sync: **once a day, free** (Vercel cron ~6am ET) + "Sync now" button. Code built on branch fub-connection (PR #2): Settings page, preview of mapping before import, matching by FUB id > email > phone, daily catch-up at /api/fub/sync. Needs: SQL 002, register system "StevesHub", FUB API key, 4 Vercel keys (FUB_API_KEY, FUB_SYSTEM_KEY, SUPABASE_SECRET_KEY, CRON_SECRET), merge + redeploy. Import will be done through the connection (no CSV). Supabase: Steve chose **stay on Free for now** (upgrade to Pro once using daily). SQL 002 RUN (Success). NOW: register system "StevesHub" at apps.followupboss.com/system-registration.
 - [ ] 3. Email: Google Workspace, own domain (not connected yet)
 - [ ] 4. Spam check: SPF / DKIM / DMARC (not checked yet)
 - [ ] 5. Calendar: Google Calendar (not connected yet)
@@ -95,7 +95,7 @@ Checklist:
 ## Accounts set up (never passwords)
 - Hub address: **steves-hub.vercel.app**
 - Vercel: signed up with GitHub (protected by GitHub two-step login), **Hobby** plan. Project **steves-hub** imported + DEPLOYED (keys: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).
-- Supabase database: **001_starter.sql run** (people, notes, tasks + privacy rules).
+- Supabase database: **001_starter.sql + 002_follow_up_boss.sql run** (people, notes, tasks + privacy rules).
 - Supabase: signed up with GitHub (protected by GitHub two-step login); organization **Steve's Hub** (Free plan); project **steves-hub** (East US). DB password saved by Steve (not here). Move to Pro ($25) before real clients go in.
 - GitHub: username **stevesellsorlando**, connected to Claude (app installed on steves-hub only) (account created; private repo **steves-hub**; **two-step login ON** with Google Authenticator; recovery codes downloaded + kept safe by Steve)
 
