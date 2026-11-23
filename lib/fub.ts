@@ -82,8 +82,8 @@ export async function fetchAllPeople(max = 20000): Promise<FubPerson[]> {
   return out;
 }
 
-// Optional extra (not turned on yet): copy a hub note to the person's Follow Up Boss timeline
-export async function addFubNote(fubPersonId: number, body: string) {
+// Copies a hub note to the person's Follow Up Boss timeline
+export async function addFubNote(fubPersonId: number, body: string): Promise<{ id?: number }> {
   return fubFetch("/notes", { method: "POST", body: JSON.stringify({ personId: fubPersonId, subject: "From Steve's Hub", body }) });
 }
 
