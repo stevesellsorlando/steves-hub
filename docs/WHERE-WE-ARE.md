@@ -103,6 +103,7 @@ Checklist:
 - Add-on Part 1: Steve picks A (import once) or B (stay connected to FUB). Then confirm he can sign in to the hub + get web address, then the import.
 
 ## Where I got stuck
+- Connect Google: "Access blocked: Error 400: redirect_uri_mismatch", and Google auto-picked his personal Gmail. (Fix: pending: check the redirect address in "error details"; then make sure he picks the WORK account.)
 - Copying the Google Client ID into Vercel: switching between the dark Incognito window (Google) and the normal window (Vercel) got confusing. Steve asked for step-by-step. **Fix: one action per message (Alt+Tab / Chrome icon to switch windows). He'd closed the Google box, but the downloaded JSON backup in Notepad had both codes.**
 - Google Cloud: the sign-in screen form only offered Steve's personal email, because Google Cloud was signed in with his personal Google account, not his work one. **Fix: round photo at the far top right (not the bell) > Add another account > work email. Then make a new project under the work account.** UPDATE: the switch didn't stick in the normal window. **Fix: Incognito window (Ctrl+Shift+N) signed in with the work email only.** Sarah: have people check the account picture in the top right before creating the project.
 - Notes import: Dennis & Abbey Motsco's notes didn't all come over (FUB has notes back to Mar 4, 2024). Cause: most of those entries are EMAILS, which Follow Up Boss doesn't share with other apps. (Fix: texts + history from FUB; emails from his Gmail after Part 2.)
