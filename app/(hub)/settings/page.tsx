@@ -5,6 +5,8 @@ import { SubmitButton } from "@/components/SubmitButton";
 import { prettyDateTime } from "@/lib/dates";
 import { NotesImporter } from "@/components/NotesImporter";
 import { notesWaiting } from "@/lib/fubNotes";
+import { googleConfigured } from "@/lib/google";
+import { testEmailToMe } from "@/app/emailActions";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -34,6 +36,8 @@ export default async function Settings({ searchParams }: { searchParams: Promise
     <div className="space-y-6">
       <h1 className="h1">⚙️ Settings</h1>
       {msg && <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3">{msg}</div>}
+
+      <GoogleCard />
 
       <section className="card space-y-4">
         <h2 className="text-lg font-bold">Follow Up Boss</h2>
@@ -82,5 +86,35 @@ export default async function Settings({ searchParams }: { searchParams: Promise
         </section>
       )}
     </div>
+  );
+}
+
+async function GoogleCard() {
+  const supabase = await createClient();
+  const { data: g } = await supabase.from("google_accounts").select("email, connected_at, refresh_token").maybeSingle();
+  const connected = Boolean(g?.refresh_token);
+  return (
+    <section className="card space-y-4">
+      <h2 className="text-lg font-bold">Google email &amp; calendar</h2>
+      {!googleConfigured() ? (
+        <p className="rounded-xl bg-stone-50 px-4 py-3 text-stone-600">Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Vercel to turn this on.</p>
+      ) : connected ? (
+        <>
+          <p className="text-stone-700">
+            ✅ Connected as <strong>{g?.email}</strong>
+            {g?.connected_at && <span className="block text-sm text-stone-500">Since {prettyDateTime(g.connected_at)}</span>}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <form action={testEmailToMe}><SubmitButton>✉️ Send a test email to myself</SubmitButton></form>
+            <a href="/api/google/start" className="btn-light">Reconnect Google</a>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="text-stone-600">Connect your Google account so emails you approve send from your real address, and so your hub can use your calendar.</p>
+          <a href="/api/google/start" className="btn-gold">Connect Google</a>
+        </>
+      )}
+    </section>
   );
 }

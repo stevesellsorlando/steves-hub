@@ -7,9 +7,12 @@ import { MicButton } from "@/components/MicButton";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { DetailsForm } from "./DetailsForm";
+import { EmailSection } from "./EmailSection";
 import { LISTS, stagesFor } from "@/lib/constants";
 import { dueLabel, prettyDateTime, todayISO } from "@/lib/dates";
 import type { Note, Person, Task } from "@/lib/types";
+
+export const maxDuration = 30;
 
 const KIND_ICON: Record<string, string> = { note: "📝", call: "📞", text: "💬", email: "✉️" };
 
@@ -119,6 +122,8 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
           </form>
         </div>
       </div>
+
+      <EmailSection person={person} />
 
       {/* Timeline */}
       <div className="card">
