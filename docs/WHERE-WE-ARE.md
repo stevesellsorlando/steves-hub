@@ -20,7 +20,7 @@ _Last updated: November 23, 2026. This note and the plan are also saved in GitHu
 - [x] Step 9: Approvals (done)
 - [x] Step 10: Services explained (done; Steve: "this all looks good")
 - [x] Step 11: Confirm plan (done; plan + 6 must-haves saved in STEVES-HUB-PLAN.md)
-- [ ] Step 12: Build (in progress). Phase 1 starter hub is LIVE on Vercel: sign-in, side menu + phone bar, Last updated, Clients / Probates / Expireds, fast after-call screen, person card (notes, Called/Texted, follow-ups, details, Became a client), basic To-Do with type filters, simple Home. Supabase: 001_starter.sql run, Steve's login user created, new sign-ups OFF. PR #1 merged. Steve signed in OK. **Hub web address: https://steves-hub.vercel.app** Practice with made-up people not done yet.
+- [ ] Step 12: Build (in progress). Phase 1 starter hub is LIVE on Vercel: sign-in, side menu + phone bar, Last updated, Clients / Probates / Expireds, fast after-call screen, person card (notes, Called/Texted, follow-ups, details, Became a client), basic To-Do with type filters, simple Home. Supabase: 001_starter.sql run, Steve's login user created, new sign-ups OFF. PR #1 merged. Steve signed in OK. **Hub web address: https://steves-hub-blush.vercel.app** (corrected) Practice with made-up people not done yet.
 
 ## Add-on: Connections (started Nov 23, 2026)
 Checklist:
@@ -93,7 +93,7 @@ Checklist:
 - FUB features he actually uses: **People list, Tasks, Notes, Tags, Email templates + sending email, Appointments/calendar.** Doesn't use: stages, smart lists, action plans, lead inbox/routing, dialer, texting, pipeline, website tracking, phone app.
 
 ## Accounts set up (never passwords)
-- Hub address: **steves-hub.vercel.app**
+- Hub address: **steves-hub-blush.vercel.app** (CORRECTED Nov 23; earlier note said steves-hub.vercel.app)
 - Vercel: signed up with GitHub (protected by GitHub two-step login), **Hobby** plan. Project **steves-hub** imported + DEPLOYED (keys: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).
 - Supabase database: **001_starter.sql + 002_follow_up_boss.sql + 003_grants.sql + 004_fub_notes.sql + 005_google_email.sql run** (people, notes, tasks + privacy rules).
 - Supabase: signed up with GitHub (protected by GitHub two-step login); organization **Steve's Hub** (Free plan); project **steves-hub** (East US). DB password saved by Steve (not here). Move to Pro ($25) before real clients go in.
@@ -103,7 +103,7 @@ Checklist:
 - Add-on Part 1: Steve picks A (import once) or B (stay connected to FUB). Then confirm he can sign in to the hub + get web address, then the import.
 
 ## Where I got stuck
-- Connect Google: "Access blocked: Error 400: redirect_uri_mismatch", and Google auto-picked his personal Gmail. (Fix: pending: check the redirect address in "error details"; then make sure he picks the WORK account.)
+- Connect Google: "Access blocked: Error 400: redirect_uri_mismatch", and Google auto-picked his personal Gmail. Cause: the hub's REAL address is **steves-hub-blush.vercel.app** (not steves-hub.vercel.app), so Google got a different callback address. (Fix: pending: add https://steves-hub-blush.vercel.app/api/google/callback to the Google OAuth client; pick the WORK account.)
 - Copying the Google Client ID into Vercel: switching between the dark Incognito window (Google) and the normal window (Vercel) got confusing. Steve asked for step-by-step. **Fix: one action per message (Alt+Tab / Chrome icon to switch windows). He'd closed the Google box, but the downloaded JSON backup in Notepad had both codes.**
 - Google Cloud: the sign-in screen form only offered Steve's personal email, because Google Cloud was signed in with his personal Google account, not his work one. **Fix: round photo at the far top right (not the bell) > Add another account > work email. Then make a new project under the work account.** UPDATE: the switch didn't stick in the normal window. **Fix: Incognito window (Ctrl+Shift+N) signed in with the work email only.** Sarah: have people check the account picture in the top right before creating the project.
 - Notes import: Dennis & Abbey Motsco's notes didn't all come over (FUB has notes back to Mar 4, 2024). Cause: most of those entries are EMAILS, which Follow Up Boss doesn't share with other apps. (Fix: texts + history from FUB; emails from his Gmail after Part 2.)
