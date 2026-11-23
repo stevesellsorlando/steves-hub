@@ -33,5 +33,4 @@ export const COMING_SOON: Record<string, { label: string; icon: string; blurb: s
   growth: { label: "Growth", icon: "🌱", blurb: "Notes from classes and books, and your continuing education hours." },
   local: { label: "Local Know-How", icon: "📍", blurb: "Vendors, neighborhood notes, Market Watch, signs and lockboxes, business dates." },
   personal: { label: "Personal", icon: "🔒", blurb: "Your private to-dos, grocery list, bills and gift list." },
-  settings: { label: "Settings", icon: "⚙️", blurb: "Edit your stages, tags, lead sources and more." },
 };

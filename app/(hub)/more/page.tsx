@@ -15,6 +15,9 @@ export default function More() {
         ))}
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
+        <Link href="/settings" className="card flex items-center gap-3 py-4 hover:border-gold">
+          <span className="text-2xl">⚙️</span><span className="font-semibold">Settings</span>
+        </Link>
         {extra.map(([slug, s]) => (
           <Link key={slug} href={`/${slug}`} className="card flex items-center gap-3 py-4 hover:border-gold">
             <span className="text-2xl">{s.icon}</span><span className="font-semibold">{s.label}</span>

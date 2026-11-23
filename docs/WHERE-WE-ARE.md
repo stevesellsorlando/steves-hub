@@ -1,6 +1,6 @@
 # Where We Are: Steve's Real Estate Hub
 
-_Last updated: November 22, 2026. This note and the plan are also saved in GitHub: steves-hub/docs/_
+_Last updated: November 23, 2026. This note and the plan are also saved in GitHub: steves-hub/docs/_
 
 ## About Steve
 - Name: Steve
@@ -20,7 +20,15 @@ _Last updated: November 22, 2026. This note and the plan are also saved in GitHu
 - [x] Step 9: Approvals (done)
 - [x] Step 10: Services explained (done; Steve: "this all looks good")
 - [x] Step 11: Confirm plan (done; plan + 6 must-haves saved in STEVES-HUB-PLAN.md)
-- [ ] Step 12: Build (in progress: all 3 accounts DONE. Phase 1 code written on branch phase-1-starter (PR open): sign-in, side menu + phone bar, Last updated, Clients/Probates/Expireds lists, fast after-call screen, person card (notes, Called/Texted, follow-ups, details, Became a client), basic To-Do with type filters, simple Home. SQL: supabase/001_starter.sql. DONE: Steve ran supabase/001_starter.sql in steves-hub (Success). NEXT: creates his login user DONE: his hub login user created (password saved by Steve). New sign-ups turned OFF. NOW: asked Steve OK to merge PR #1, then merge PR, then import in Vercel + add 2 keys.)
+- [ ] Step 12: Build (in progress). Phase 1 starter hub is LIVE on Vercel: sign-in, side menu + phone bar, Last updated, Clients / Probates / Expireds, fast after-call screen, person card (notes, Called/Texted, follow-ups, details, Became a client), basic To-Do with type filters, simple Home. Supabase: 001_starter.sql run, Steve's login user created, new sign-ups OFF. PR #1 merged. Steve signed in OK. **Hub web address: https://steves-hub.vercel.app** Practice with made-up people not done yet.
+
+## Add-on: Connections (started Nov 23, 2026)
+Checklist:
+- [ ] 1. Import from Follow Up Boss (not done: no import yet)
+- [ ] 2. Follow Up Boss: **B) stay connected** (chosen Nov 23). One-way FUB -> hub. Steve is NOT the FUB owner (team/brokerage owns it) -> no webhooks. Sync: **once a day, free** (Vercel cron ~6am ET) + "Sync now" button. Code built on branch fub-connection (PR #2): Settings page, preview of mapping before import, matching by FUB id > email > phone, daily catch-up at /api/fub/sync. Needs: SQL 002, register system "StevesHub", FUB API key, 4 Vercel keys (FUB_API_KEY, FUB_SYSTEM_KEY, SUPABASE_SECRET_KEY, CRON_SECRET), merge + redeploy. Import will be done through the connection (no CSV). Supabase: Steve chose **stay on Free for now** (upgrade to Pro once using daily). SQL 002 RUN (Success). System registered (name "Steve's Hub", header StevesHub); system key copied + saved in his password manager. FUB_SYSTEM_KEY SAVED in Vercel. FUB API key "Steve's Hub" created in FUB (Admin > API; he had permission; left his other keys Domenique / Birthday wish / RedX alone) and SAVED as FUB_API_KEY. SUPABASE_SECRET_KEY SAVED. CRON_SECRET SAVED. ALL 4 KEYS IN VERCEL (FUB_SYSTEM_KEY, FUB_API_KEY, SUPABASE_SECRET_KEY, CRON_SECRET). NOW: asked OK to then merge PR #2 (auto-deploys).
+- [ ] 3. Email: Google Workspace, own domain (not connected yet)
+- [ ] 4. Spam check: SPF / DKIM / DMARC (not checked yet)
+- [ ] 5. Calendar: Google Calendar (not connected yet)
 
 ## Steve's choices so far
 - Hub name: **Steve's Hub**
@@ -85,14 +93,20 @@ _Last updated: November 22, 2026. This note and the plan are also saved in GitHu
 - FUB features he actually uses: **People list, Tasks, Notes, Tags, Email templates + sending email, Appointments/calendar.** Doesn't use: stages, smart lists, action plans, lead inbox/routing, dialer, texting, pipeline, website tracking, phone app.
 
 ## Accounts set up (never passwords)
-- Vercel: signed up with GitHub (protected by GitHub two-step login), **Hobby** plan. Project not imported yet.
-- Supabase database: **001_starter.sql run** (people, notes, tasks + privacy rules).
+- Hub address: **steves-hub.vercel.app**
+- Vercel: signed up with GitHub (protected by GitHub two-step login), **Hobby** plan. Project **steves-hub** imported + DEPLOYED (keys: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).
+- Supabase database: **001_starter.sql + 002_follow_up_boss.sql run** (people, notes, tasks + privacy rules).
 - Supabase: signed up with GitHub (protected by GitHub two-step login); organization **Steve's Hub** (Free plan); project **steves-hub** (East US). DB password saved by Steve (not here). Move to Pro ($25) before real clients go in.
 - GitHub: username **stevesellsorlando**, connected to Claude (app installed on steves-hub only) (account created; private repo **steves-hub**; **two-step login ON** with Google Authenticator; recovery codes downloaded + kept safe by Steve)
 
 ## Very next step
-- Walk Steve click by click: (1) Supabase SQL Editor (project steves-hub) -> paste supabase/001_starter.sql -> Run -> "ran it". (2) Supabase Authentication > Users > Add user (his email + a new password, Auto Confirm) and turn OFF new sign-ups. (3) Merge PR. (4) Vercel: import steves-hub, add NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (from Supabase Project Settings > API / API Keys), Deploy. (5) Practice with 5-6 made-up people.
+- Add-on Part 1: Steve picks A (import once) or B (stay connected to FUB). Then confirm he can sign in to the hub + get web address, then the import.
 
 ## Where I got stuck
+- Follow Up Boss system key got lost: copying the key NAME from the chat replaced the system key on his clipboard, the FUB page was gone, and it wasn't in his password manager. **Fix: Follow Up Boss had emailed the system key; typed the Key name by hand first, then copied the key from the email and pasted it last.** Lesson for Sarah: type the Key name first, THEN copy the secret and paste it last.
+- Vercel Environment Variables: Steve landed on the TEAM-level Environment Variables page (lists keys, no Key/Value boxes) instead of the steves-hub project's own Settings page. **Fix: picked steves-hub from the "All Projects" menu at the top; that opened the project's own Environment Variables page with an "Add Environment Variable" button.**
+- Vercel environment variables: the Key and Value boxes got mixed up (the address went into the Key box), and only one row existed. Vercel showed a red "invalid" error. **Fix: renamed that row's Key, then "+ Add More" for the URL as its own row, giving Key and Value one at a time.** (Sarah: show a picture of what the two rows should look like.) Also the final button says "Create Project," not "Deploy."
+- Supabase API Keys page: Steve didn't see the "sb_publishable_" key I described. Screenshot showed he was on the **Data API** page (not API Keys), and that page's URL ends in **/rest/v1/**, so key 1 in Vercel must be trimmed to end at .supabase.co. **Fix: Steve trimmed key 1; used a direct link to the API Keys page (supabase.com/dashboard/project/<ref>/settings/api-keys) instead of hunting the menu.** (Sarah: give the direct links.)
+- Vercel keys: I gave too many steps at once (Vercel + Supabase + back again) and Steve couldn't find things. He asked to start over with opening Supabase. **Fix: one tiny step at a time (open Supabase > gear > Data API > copy URL > Vercel tab > open Environment Variables > paste) worked.**
 - Supabase SQL Editor: Steve saw a notice "Snippets no longer save automatically" instead of the empty box I described, and thought he was in the wrong place. **Fix: that notice is just a banner inside the SQL Editor; close it and click "+" / New query.** (Sarah: describe that banner in the instructions.)
 - GitHub two-step login: the 6-digit code from Google Authenticator kept failing ("verification code failed"), even with a fresh code. **Fix: on iPhone, Settings > General > Date & Time > "Set Automatically" ON, then a fresh code worked.** (Sarah: worth adding this tip before the code step.)
