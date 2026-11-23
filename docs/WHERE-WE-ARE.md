@@ -20,7 +20,7 @@ _Last updated: November 23, 2026. This note and the plan are also saved in GitHu
 - [x] Step 9: Approvals (done)
 - [x] Step 10: Services explained (done; Steve: "this all looks good")
 - [x] Step 11: Confirm plan (done; plan + 6 must-haves saved in STEVES-HUB-PLAN.md)
-- [ ] Step 12: Build (in progress). Phase 1 starter hub is LIVE on Vercel: sign-in, side menu + phone bar, Last updated, Clients / Probates / Expireds, fast after-call screen, person card (notes, Called/Texted, follow-ups, details, Became a client), basic To-Do with type filters, simple Home. Supabase: 001_starter.sql run, Steve's login user created, new sign-ups OFF. PR #1 merged. STILL TO CONFIRM: Steve signed in OK + his hub's web address (…vercel.app). Practice with made-up people not done yet.
+- [ ] Step 12: Build (in progress). Phase 1 starter hub is LIVE on Vercel: sign-in, side menu + phone bar, Last updated, Clients / Probates / Expireds, fast after-call screen, person card (notes, Called/Texted, follow-ups, details, Became a client), basic To-Do with type filters, simple Home. Supabase: 001_starter.sql run, Steve's login user created, new sign-ups OFF. PR #1 merged. Steve signed in OK. **Hub web address: https://steves-hub.vercel.app** Practice with made-up people not done yet.
 
 ## Add-on: Connections (started Nov 23, 2026)
 Checklist:
@@ -93,6 +93,7 @@ Checklist:
 - FUB features he actually uses: **People list, Tasks, Notes, Tags, Email templates + sending email, Appointments/calendar.** Doesn't use: stages, smart lists, action plans, lead inbox/routing, dialer, texting, pipeline, website tracking, phone app.
 
 ## Accounts set up (never passwords)
+- Hub address: **steves-hub.vercel.app**
 - Vercel: signed up with GitHub (protected by GitHub two-step login), **Hobby** plan. Project **steves-hub** imported + DEPLOYED (keys: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY).
 - Supabase database: **001_starter.sql run** (people, notes, tasks + privacy rules).
 - Supabase: signed up with GitHub (protected by GitHub two-step login); organization **Steve's Hub** (Free plan); project **steves-hub** (East US). DB password saved by Steve (not here). Move to Pro ($25) before real clients go in.
