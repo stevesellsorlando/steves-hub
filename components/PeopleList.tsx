@@ -1,3 +1,4 @@
+import { prettyPhone } from "@/lib/format";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { LISTS, stagesFor, type ListKey } from "@/lib/constants";
@@ -91,7 +92,7 @@ export async function PeopleList({ list, q, stage, page = 1 }: { list: ListKey; 
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-lg font-semibold">{p.name}</p>
                   <p className="truncate text-sm text-stone-500">
-                    {[p.phone, showProperty ? p.property_address : p.address].filter(Boolean).join(" · ")}
+                    {[prettyPhone(p.phone), showProperty ? p.property_address : p.address].filter(Boolean).join(" · ")}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 text-sm">

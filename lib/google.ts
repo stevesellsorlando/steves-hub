@@ -113,6 +113,18 @@ async function gmail<T = any>(token: string, path: string, init: RequestInit = {
   return res.json();
 }
 
+async function gmailRetry<T = any>(token: string, path: string): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await gmail<T>(token, path);
+    } catch (e) {
+      const busy = e instanceof Error && /Gmail error (429|403).*(concurrent|rate|Rate)/.test(e.message);
+      if (!busy || attempt >= 3) throw e;
+      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+    }
+  }
+}
+
 const b64url = (s: string) => Buffer.from(s, "utf8").toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 const encodeHeader = (s: string) => (/^[\x20-\x7e]*$/.test(s) ? s : `=?UTF-8?B?${Buffer.from(s, "utf8").toString("base64")}?=`);
 
@@ -138,11 +150,17 @@ export async function emailsWith(token: string, addresses: string[], max = 25): 
   if (!clean.length) return [];
   const q = clean.map((a) => `from:${a} OR to:${a} OR cc:${a}`).join(" OR ");
   const list = await gmail<{ messages?: { id: string; threadId: string }[] }>(token, `/messages?maxResults=${max}&q=${encodeURIComponent(q)}`);
-  const msgs = await Promise.all(
-    (list.messages ?? []).map((m) =>
-      gmail<any>(token, `/messages/${m.id}?format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Date`),
-    ),
-  );
+  // A few at a time: Gmail refuses too many at once
+  const ids = list.messages ?? [];
+  const msgs: any[] = [];
+  for (let i = 0; i < ids.length; i += 5) {
+    const group = await Promise.all(
+      ids.slice(i, i + 5).map((m) =>
+        gmailRetry(token, `/messages/${m.id}?format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Date`),
+      ),
+    );
+    msgs.push(...group);
+  }
   return msgs.map((m) => {
     const h = (name: string) => m.payload?.headers?.find((x: any) => x.name.toLowerCase() === name.toLowerCase())?.value ?? "";
     return {

@@ -1,5 +1,6 @@
 "use client";
 
+import { prettyPhone } from "@/lib/format";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -84,7 +85,7 @@ export function SearchBar({ dark = false }: { dark?: boolean }) {
                   >
                     <span className="min-w-0">
                       <span className="block truncate font-medium">{h.name}</span>
-                      <span className="block truncate text-sm text-stone-500">{[h.phone, h.property_address].filter(Boolean).join(" · ")}</span>
+                      <span className="block truncate text-sm text-stone-500">{[prettyPhone(h.phone), h.property_address].filter(Boolean).join(" · ")}</span>
                     </span>
                     <span className="chip shrink-0 border-gold/40 bg-amber-50 text-xs text-gold-dark">{LABEL[h.list]}</span>
                   </button>
