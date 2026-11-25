@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { TaskRow } from "@/components/TaskRow";
 import { OkBanner } from "@/components/OkBanner";
+import { EventList } from "@/components/EventList";
 import { TZ, todayISO } from "@/lib/dates";
 import type { Task } from "@/lib/types";
 
@@ -49,9 +50,17 @@ export default async function Home() {
         )}
       </section>
 
+      <section className="card">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-bold">📅 This week</h2>
+          <Link href="/calendar" className="text-sm text-gold-dark underline">Open calendar</Link>
+        </div>
+        <EventList fromISO={new Date().toISOString()} toISO={new Date(Date.now() + 7 * 86400000).toISOString()} emptyText="Nothing on your calendar this week." />
+      </section>
+
       <section className="card border-dashed bg-transparent shadow-none">
         <h2 className="mb-1 font-bold">Coming soon to your homepage</h2>
-        <p className="text-stone-500">Orlando weather · mortgage rates · real estate news and social media ideas · your active listings · this week&apos;s calendar, plus your morning “here&apos;s your day” email.</p>
+        <p className="text-stone-500">Orlando weather · mortgage rates · real estate news and social media ideas · your active listings, plus your morning “here&apos;s your day” email.</p>
       </section>
     </div>
   );
