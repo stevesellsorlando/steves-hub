@@ -29,6 +29,9 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
     supabase.from("tasks").select("*").eq("person_id", id).is("done_at", null).order("due_date").returns<Task[]>(),
   ]);
 
+  // Remember this visit for "Recently opened" in the search bar
+  await supabase.from("people").update({ last_viewed_at: new Date().toISOString() }).eq("id", id);
+
   const meta = LISTS[person.list];
   const today = todayISO();
 
