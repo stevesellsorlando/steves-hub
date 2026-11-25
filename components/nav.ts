@@ -1,7 +1,7 @@
 export const SIDE_MENU = [
   { href: "/", label: "Home", icon: "🏠" },
   { href: "/calendar", label: "Calendar", icon: "📅" },
-  { href: "/todo", label: "To-Do", icon: "✅" },
+  { href: "/tasks", label: "Tasks", icon: "✅" },
   { href: "/clients", label: "Clients", icon: "👥" },
   { href: "/probates", label: "Probates", icon: "📜" },
   { href: "/expireds", label: "Expireds", icon: "🏚️" },

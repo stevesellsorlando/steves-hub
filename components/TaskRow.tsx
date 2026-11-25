@@ -27,7 +27,7 @@ export function TaskRow({ t }: { t: Task }) {
         </p>
       </div>
       <span className="chip border-stone-200 bg-stone-50 text-xs">{t.type}</span>
-      <Edit label="Edit to-do" className="relative">
+      <Edit label="Edit task" className="relative">
         <form action={editTask.bind(null, t.id, t.person_id)} className="w-64 space-y-2">
           <input name="title" defaultValue={t.title} required className="input py-2" />
           <input name="due_date" type="date" defaultValue={t.due_date} className="input py-2" />

@@ -39,7 +39,7 @@ export default async function Home() {
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-lg font-bold">Follow-ups due today {due?.length ? <span className="text-stone-400">({due.length})</span> : null}</h2>
-          <Link href="/todo" className="text-sm text-gold-dark underline">See all to-dos</Link>
+          <Link href="/tasks" className="text-sm text-gold-dark underline">See all tasks</Link>
         </div>
         {due?.length ? (
           <ul className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">

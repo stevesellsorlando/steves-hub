@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
         token,
         me,
         `🎯 New ${kind} lead: ${name}`,
-        `New ${kind.toLowerCase()} lead from your landing page (${source}).\n\nName: ${name}\nPhone: ${phone || "-"}\nEmail: ${email || "-"}\n\nOpen their card: ${link}\n\nA "call today" follow-up is on your To-Do list.`,
+        `New ${kind.toLowerCase()} lead from your landing page (${source}).\n\nName: ${name}\nPhone: ${phone || "-"}\nEmail: ${email || "-"}\n\nOpen their card: ${link}\n\nA "call today" follow-up is on your Tasks list.`,
       );
     }
   } catch {}
