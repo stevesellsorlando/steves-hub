@@ -16,6 +16,14 @@ export async function EmailSection({ person }: { person: Person }) {
   let note: string | null = null;
   let account: string | null = null;
   const addresses = [person.email, person.email2].filter(Boolean) as string[];
+  // Emails sent from the hub always show, even before Gmail's search catches up
+  const { data: hubSent } = await supabase
+    .from("outbox")
+    .select("id, subject, body, sent_at, gmail_message_id, to_email")
+    .eq("person_id", person.id)
+    .eq("status", "sent")
+    .order("sent_at", { ascending: false })
+    .limit(25);
   if (user && addresses.length) {
     try {
       const { token, email } = await accessToken(supabase, user.id);
@@ -25,6 +33,21 @@ export async function EmailSection({ person }: { person: Person }) {
       note = e instanceof GoogleNotConnected ? "Connect Google in Settings to see your emails with them here." : e instanceof Error ? e.message : String(e);
     }
   }
+
+  const seen = new Set(emails.map((m) => m.id));
+  for (const h of hubSent ?? []) {
+    if (h.gmail_message_id && seen.has(h.gmail_message_id)) continue;
+    emails.push({
+      id: h.gmail_message_id ?? h.id,
+      threadId: h.gmail_message_id ?? "",
+      subject: h.subject || "(no subject)",
+      from: "You (sent from your hub)",
+      to: h.to_email,
+      date: h.sent_at ?? new Date().toISOString(),
+      snippet: (h.body ?? "").slice(0, 160),
+    });
+  }
+  emails.sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <div className="card space-y-4">
@@ -56,11 +79,8 @@ export async function EmailSection({ person }: { person: Person }) {
 
       <div>
         <p className="label">Your emails with them{account ? ` (from ${account})` : ""}</p>
-        {!addresses.length ? (
-          <p className="text-stone-500">No email address on this card yet.</p>
-        ) : note ? (
-          <p className="text-stone-500">{note}</p>
-        ) : emails.length ? (
+        {note && <p className="mb-2 text-stone-500">{note}</p>}
+        {emails.length ? (
           <ul className="space-y-2">
             {emails.map((m) => (
               <li key={m.id} className="rounded-xl bg-stone-50 px-4 py-3">
@@ -77,7 +97,9 @@ export async function EmailSection({ person }: { person: Person }) {
               </li>
             ))}
           </ul>
-        ) : (
+        ) : !addresses.length ? (
+          <p className="text-stone-500">No email address on this card yet.</p>
+        ) : note ? null : (
           <p className="text-stone-500">No emails found with {addresses.join(" or ")}.</p>
         )}
       </div>

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { accessToken, sendEmail } from "@/lib/google";
+import { saveNote } from "@/lib/saveNote";
 
 async function who() {
   const supabase = await createClient();
@@ -55,7 +56,7 @@ export async function approveAndSend(id: string, fd: FormData) {
     const gmailId = await sendEmail(token, e.to_email, e.subject, e.body);
     await supabase.from("outbox").update({ status: "sent", sent_at: new Date().toISOString(), gmail_message_id: gmailId, error: null }).eq("id", id);
     if (e.person_id) {
-      await supabase.from("notes").insert({ person_id: e.person_id, kind: "email", body: `Email sent: ${e.subject}\n\n${e.body}` });
+      await saveNote(supabase, e.person_id, "email", `Email sent: ${e.subject}\n\n${e.body}`);
       await supabase.from("people").update({ last_contacted_at: new Date().toISOString() }).eq("id", e.person_id);
     }
     msg = `✓ Sent to ${e.to_email}. It's in your Gmail Sent folder.`;
