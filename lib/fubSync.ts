@@ -19,6 +19,10 @@ type Existing = {
   lead_source: string | null;
   fub_last_activity: string | null;
   fub_notes_synced_at: string | null;
+  phones: unknown;
+  emails: unknown;
+  addresses: unknown;
+  fub_updated_at: string | null;
 };
 
 export type SyncResult = { total: number; created: number; updated: number; unchanged: number };
@@ -31,7 +35,7 @@ export async function syncFromFub(supabase: SupabaseClient, userId: string, peop
   for (let from = 0; ; from += 1000) {
     const { data: rows, error } = await supabase
       .from("people")
-      .select("id, fub_id, fub_stage, list, name, phone, phone2, email, email2, address, tags, lead_source, fub_last_activity, fub_notes_synced_at")
+      .select("id, fub_id, fub_stage, list, name, phone, phone2, email, email2, address, tags, lead_source, fub_last_activity, fub_notes_synced_at, phones, emails, addresses, fub_updated_at")
       .eq("user_id", userId)
       .order("id")
       .range(from, from + 999);
@@ -87,9 +91,12 @@ export async function syncFromFub(supabase: SupabaseClient, userId: string, peop
     // Follow Up Boss is the main copy for contact info; keep any tags added in the hub too.
     const tags = Array.from(new Set([...(match.tags ?? []), ...f.tags]));
     const patch: Record<string, unknown> = {};
-    const set = (k: keyof Existing, v: unknown) => {
+    const setRaw = (k: keyof Existing, v: unknown) => {
       if (v !== null && v !== undefined && v !== "" && JSON.stringify(match![k]) !== JSON.stringify(v)) patch[k] = v;
     };
+    // Steve's own edits in the hub stick: contact info only follows Follow Up Boss when the person changed there since our last look.
+    const fubChanged = !match.fub_id || !match.fub_updated_at || !p.updated || new Date(p.updated) > new Date(match.fub_updated_at);
+    const set = fubChanged ? setRaw : () => {};
     set("name", f.name);
     set("phone", f.phone);
     set("phone2", f.phone2);
@@ -97,7 +104,10 @@ export async function syncFromFub(supabase: SupabaseClient, userId: string, peop
     set("email2", f.email2);
     set("address", f.address);
     set("lead_source", f.lead_source);
-    if (tags.length !== (match.tags ?? []).length) patch.tags = tags;
+    set("phones", f.phones);
+    set("emails", f.emails);
+    set("addresses", f.addresses);
+    if (fubChanged && tags.length !== (match.tags ?? []).length) patch.tags = tags;
     if (!match.fub_id) patch.fub_id = p.id;
     // Only change the hub stage when the stage changed in Follow Up Boss, so Steve's own hub changes stick.
     if ((p.stage ?? null) !== match.fub_stage) {
@@ -111,7 +121,7 @@ export async function syncFromFub(supabase: SupabaseClient, userId: string, peop
       if (match.fub_notes_synced_at && new Date(p.lastActivity) > new Date(match.fub_notes_synced_at)) patch.fub_notes_synced_at = null;
     }
     if (Object.keys(patch).length) {
-      if (changed) patch.fub_updated_at = p.updated ?? null;
+      if (changed || fubChanged) patch.fub_updated_at = p.updated ?? match.fub_updated_at;
       const { error: upErr } = await supabase.from("people").update(patch).eq("id", match.id).eq("user_id", userId);
       if (upErr) throw new Error(upErr.message);
       if (changed) result.updated++;

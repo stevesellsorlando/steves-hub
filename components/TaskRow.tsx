@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { completeTask } from "@/app/actions";
+import { completeTask, deleteTask, editTask } from "@/app/actions";
+import { Edit } from "./Edit";
 import { SubmitButton } from "./SubmitButton";
 import { dueLabel, todayISO } from "@/lib/dates";
 import type { Task } from "@/lib/types";
@@ -25,6 +26,16 @@ export function TaskRow({ t }: { t: Task }) {
         </p>
       </div>
       <span className="chip border-stone-200 bg-stone-50 text-xs">{t.type}</span>
+      <Edit label="Edit to-do" className="relative">
+        <form action={editTask.bind(null, t.id, t.person_id)} className="w-64 space-y-2">
+          <input name="title" defaultValue={t.title} required className="input py-2" />
+          <input name="due_date" type="date" defaultValue={t.due_date} className="input py-2" />
+          <div className="flex gap-2">
+            <SubmitButton className="btn-gold px-3 py-1.5 text-sm">Save</SubmitButton>
+            <button formAction={deleteTask.bind(null, t.id)} className="btn-light px-3 py-1.5 text-sm text-red-700">Delete</button>
+          </div>
+        </form>
+      </Edit>
     </li>
   );
 }

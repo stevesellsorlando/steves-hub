@@ -54,9 +54,9 @@ export type FubPerson = {
   stage?: string;
   source?: string;
   tags?: string[];
-  emails?: { value: string; isPrimary?: boolean | number }[];
-  phones?: { value: string; isPrimary?: boolean | number }[];
-  addresses?: { street?: string; city?: string; state?: string; code?: string }[];
+  emails?: { value: string; type?: string; isPrimary?: boolean | number }[];
+  phones?: { value: string; type?: string; isPrimary?: boolean | number }[];
+  addresses?: { type?: string; street?: string; city?: string; state?: string; code?: string }[];
   background?: string;
   updated?: string;
   created?: string;
@@ -122,4 +122,23 @@ export function fetchTexts(personId: number) {
 
 export function fetchEvents(personId: number) {
   return allPages<FubEvent>(`${BASE}/events?personId=${personId}&limit=100`, "events");
+}
+
+export type FubRelationship = {
+  id: number;
+  type?: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  emails?: { value: string }[];
+  phones?: { value: string }[];
+  addresses?: { street?: string; city?: string; state?: string; code?: string }[];
+};
+
+export function fetchRelationships(personId: number) {
+  return allPages<FubRelationship>(`${BASE}/peopleRelationships?personId=${personId}&limit=100`, ["peoplerelationships", "peopleRelationships", "relationships"]);
+}
+
+export async function updateFubNote(fubNoteId: number, body: string) {
+  return fubFetch(`/notes/${fubNoteId}`, { method: "PUT", body: JSON.stringify({ body }) });
 }

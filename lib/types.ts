@@ -42,7 +42,14 @@ export type Person = {
   previous_agent: string | null;
   last_contacted_at: string | null;
   created_at: string;
+  phones?: Labeled[] | null;
+  emails?: Labeled[] | null;
+  addresses?: Labeled[] | null;
 };
+
+export type Labeled = { value: string; label: string | null };
+
+export type Relationship = { id: string; person_id: string; label: string | null; name: string; phone: string | null; email: string | null; address: string | null };
 
 export type Note = { id: string; person_id: string; kind: string; body: string; created_at: string };
 
