@@ -23,7 +23,6 @@ export const PHONE_BAR = [
 // Pages that are on the plan but not built yet. They show a friendly "coming soon" page.
 export const COMING_SOON: Record<string, { label: string; icon: string; blurb: string }> = {
   listings: { label: "Listings", icon: "🏡", blurb: "One page per listing with house facts, notes, seller reports and your pipeline boards." },
-  marketing: { label: "Marketing", icon: "📣", blurb: "Email templates, follow-up plans, scripts and your brand kit." },
   bookkeeping: { label: "Bookkeeping", icon: "💵", blurb: "Income from each closing, expenses with receipt photos, mileage, and CPA downloads." },
   tracker: { label: "Tracker", icon: "📈", blurb: "Calls, appointments and closings against your goals, plus your weekly review." },
   leads: { label: "Leads", icon: "📥", blurb: "A separate inbox for new online leads." },

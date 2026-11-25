@@ -142,3 +142,23 @@ export function fetchRelationships(personId: number) {
 export async function updateFubNote(fubNoteId: number, body: string) {
   return fubFetch(`/notes/${fubNoteId}`, { method: "PUT", body: JSON.stringify({ body }) });
 }
+
+// Sends a new lead to Follow Up Boss the recommended way (an "event"), so its lead rules and action plans run
+export async function sendFubLead(lead: { firstName: string; lastName: string; email: string; phone: string; kind: "Buyer" | "Seller"; source: string; message: string }) {
+  return fubFetch("/events", {
+    method: "POST",
+    body: JSON.stringify({
+      source: `Steve's Hub Landing Page (${lead.source})`,
+      system: FUB_SYSTEM,
+      type: lead.kind === "Seller" ? "Seller Inquiry" : "General Inquiry",
+      message: lead.message,
+      person: {
+        firstName: lead.firstName,
+        lastName: lead.lastName,
+        emails: lead.email ? [{ value: lead.email }] : [],
+        phones: lead.phone ? [{ value: lead.phone }] : [],
+        tags: ["Landing page", lead.kind],
+      },
+    }),
+  });
+}

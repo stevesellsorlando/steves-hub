@@ -52,7 +52,20 @@ export const LEAD_SOURCES = [
   "Zillow / Realtor.com",
   "My website or social media",
   "Royalty Real Estate Boutique",
+  "Landing page",
+  "Facebook ad",
+  "Instagram ad",
+  "QR code",
 ];
+
+// Where a landing-page visitor came from (?src=...)
+export function sourceFromParam(src?: string | null): string {
+  const s = (src ?? "").toLowerCase();
+  if (s.startsWith("fb") || s.includes("facebook")) return "Facebook ad";
+  if (s.startsWith("ig") || s.includes("instagram")) return "Instagram ad";
+  if (s.includes("qr")) return "QR code";
+  return "Landing page";
+}
 
 export function defaultSource(list: ListKey) {
   return list === "probate" ? "Probate" : list === "expired" ? "Expired listing" : "";
