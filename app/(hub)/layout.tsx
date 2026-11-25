@@ -4,6 +4,7 @@ import { SideMenu, PhoneBar } from "@/components/SideMenu";
 import { signOut } from "@/app/actions";
 import { QUICK_LINKS } from "@/lib/constants";
 import { TZ } from "@/lib/dates";
+import { SearchBar } from "@/components/SearchBar";
 
 const lastUpdated = new Date(process.env.NEXT_PUBLIC_BUILD_TIME ?? Date.now()).toLocaleString("en-US", {
   timeZone: TZ,
@@ -38,9 +39,17 @@ export default function HubLayout({ children }: { children: React.ReactNode }) {
           <span className="font-bold text-gold">Steve&apos;s Hub</span>
         </Link>
       </header>
+      <div className="sticky top-[46px] z-20 bg-charcoal px-4 pb-3 md:hidden">
+        <SearchBar dark />
+      </div>
 
       <main className="px-4 pb-28 pt-5 md:ml-60 md:px-10 md:pb-12 md:pt-8">
-        <div className="mx-auto max-w-5xl">{children}</div>
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-6 hidden md:block">
+            <SearchBar />
+          </div>
+          {children}
+        </div>
         <p className="mt-10 text-center text-xs text-stone-400 md:hidden">Last updated: {lastUpdated}</p>
       </main>
       <PhoneBar />
