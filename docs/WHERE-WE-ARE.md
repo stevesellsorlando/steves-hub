@@ -100,7 +100,7 @@ Checklist:
 - GitHub: username **stevesellsorlando**, connected to Claude (app installed on steves-hub only) (account created; private repo **steves-hub**; **two-step login ON** with Google Authenticator; recovery codes downloaded + kept safe by Steve)
 
 ## Very next step
-- ALL 5 CONNECTION PARTS DONE (Nov 25). Asked Steve: test drive or keep building?
+- ALL 5 CONNECTION PARTS DONE (Nov 25). Steve chose to TEST DRIVE. When he comes back: ask what he'd change, then next build = Claude app connector, then morning email.
 - Still to build from the original plan: Claude app connector (talk to Claude: "In Steve's Hub, ..."), morning "here's your day" email before 8 a.m., homepage extras (Orlando weather, mortgage rates, news, active listings), Listings / pipelines, follow-up plans, Marketing, Bookkeeping, Tracker, weekly contacts backup + "Download all my contacts", "How to change your hub" cheat sheet.
 - Small cleanups: delete the unused Google client secret (ends 72an) and the two old personal-account Google Cloud projects; confirm Test Hubtest deleted in FUB + hub; Supabase Pro ($25) once he uses the hub daily; Vercel Pro ($20) for business use.
 
