@@ -27,6 +27,7 @@ import { MicButton } from "@/components/MicButton";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { Tabs } from "@/components/Tabs";
+import { EventForm } from "@/components/EventForm";
 import { Edit, EditButton, EditPanel } from "@/components/Edit";
 import { contactList, type ContactKind } from "@/lib/contact";
 import { DetailsForm } from "./DetailsForm";
@@ -126,9 +127,9 @@ function ContactForm({ personId, kind, index, item }: { personId: string; kind: 
   );
 }
 
-export default async function PersonPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string; t?: string }> }) {
+export default async function PersonPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ saved?: string; t?: string; msg?: string }> }) {
   const { id } = await params;
-  const { saved, t } = await searchParams;
+  const { saved, t, msg } = await searchParams;
   const filter: FilterKey = (FILTERS.find((f) => f.key === t)?.key ?? "all") as FilterKey;
   const supabase = await createClient();
 
@@ -182,6 +183,7 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
     <div className="space-y-4">
       <Link href={meta.path} className="text-sm text-stone-500 hover:text-charcoal">← Back to {meta.label}</Link>
       {saved && <div className="rounded-2xl border border-green-200 bg-green-50 px-5 py-3 text-green-800">✓ Saved.</div>}
+      {msg && <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3">{msg}</div>}
 
       <div className="grid gap-5 lg:grid-cols-[380px_minmax(0,1fr)_280px]">
         {/* ---------- LEFT: who they are ---------- */}
@@ -321,7 +323,7 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
         {/* ---------- MIDDLE: do something + timeline ---------- */}
         <div className="min-w-0 space-y-5">
           <section className="card pt-2">
-            <Tabs labels={["📌 Create note", "✉️ Send email", "📞 Log call"]}>
+            <Tabs labels={["📌 Create note", "✉️ Send email", "📞 Log call", "📅 Appointment"]}>
               <form action={addNote.bind(null, person.id)} className="space-y-3">
                 <div className="flex justify-end"><MicButton targetId="note-body" /></div>
                 <textarea id="note-body" name="body" rows={4} className="input bg-amber-50/40" placeholder="What did they tell you?" />
@@ -350,6 +352,8 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
                 <FollowUpPicker />
                 <SubmitButton>Log call</SubmitButton>
               </form>
+
+              <EventForm personId={person.id} title={`Appointment with ${person.name}`} location={person.property_address ?? addresses[0]?.value ?? ""} />
             </Tabs>
           </section>
 

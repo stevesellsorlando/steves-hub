@@ -7,6 +7,8 @@ import { NotesImporter } from "@/components/NotesImporter";
 import { notesWaiting } from "@/lib/fubNotes";
 import { googleConfigured, googleKeyCheck } from "@/lib/google";
 import { testEmailToMe } from "@/app/emailActions";
+import { saveShownCalendars } from "@/app/calendarActions";
+import { calendarToken, listCalendars, type Cal } from "@/lib/calendar";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -108,6 +110,7 @@ async function GoogleCard() {
             <form action={testEmailToMe}><SubmitButton>✉️ Send a test email to myself</SubmitButton></form>
             <a href="/api/google/start" className="btn-light">Reconnect Google</a>
           </div>
+          <CalendarPicker />
         </>
       ) : (
         <>
@@ -133,5 +136,35 @@ function KeyCheck() {
         </li>
       </ul>
     </details>
+  );
+}
+
+async function CalendarPicker() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  let cals: Cal[] = [];
+  try {
+    cals = await listCalendars(await calendarToken(supabase, user.id));
+  } catch {
+    return <p className="text-sm text-stone-500">Couldn&apos;t load your calendars. Try “Reconnect Google.”</p>;
+  }
+  const { data: g } = await supabase.from("google_accounts").select("shown_calendars").maybeSingle();
+  const picked: string[] | null = g?.shown_calendars ?? null;
+  return (
+    <form action={saveShownCalendars} className="space-y-2 rounded-xl bg-stone-50 px-4 py-3">
+      <p className="font-semibold">📅 Calendars to show in your hub</p>
+      {cals.map((c) => (
+        <label key={c.id} className="flex items-center gap-3">
+          <input type="checkbox" name="cal" value={c.id} defaultChecked={picked ? picked.includes(c.id) : c.primary} className="h-5 w-5 accent-[#c9a24a]" />
+          <span className="h-3 w-3 rounded-full" style={{ background: c.color }} />
+          <span>{c.name}{c.primary ? " (your main calendar)" : ""}</span>
+        </label>
+      ))}
+      <SubmitButton className="btn-gold px-4 py-2">Save calendars</SubmitButton>
+      <p className="text-sm text-stone-500">New events you add from the hub go on your main calendar.</p>
+    </form>
   );
 }
