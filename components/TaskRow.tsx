@@ -1,3 +1,4 @@
+import { prettyPhone } from "@/lib/format";
 import Link from "next/link";
 import { completeTask, deleteTask, editTask } from "@/app/actions";
 import { Edit } from "./Edit";
@@ -22,7 +23,7 @@ export function TaskRow({ t }: { t: Task }) {
         )}
         <p className="text-sm text-stone-500">
           <span className={overdue ? "text-red-600" : ""}>{dueLabel(t.due_date)}</span>
-          {t.people?.phone && <> · <a href={`tel:${t.people.phone}`} className="hover:text-gold-dark">📞 {t.people.phone}</a></>}
+          {t.people?.phone && <> · <a href={`tel:${t.people.phone}`} className="hover:text-gold-dark">📞 {prettyPhone(t.people.phone)}</a></>}
         </p>
       </div>
       <span className="chip border-stone-200 bg-stone-50 text-xs">{t.type}</span>

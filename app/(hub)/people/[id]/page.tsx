@@ -27,7 +27,7 @@ import { MicButton } from "@/components/MicButton";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { Tabs } from "@/components/Tabs";
-import { Edit } from "@/components/Edit";
+import { Edit, EditButton, EditPanel } from "@/components/Edit";
 import { contactList, type ContactKind } from "@/lib/contact";
 import { DetailsForm } from "./DetailsForm";
 import { gmailForPerson } from "@/lib/personEmails";
@@ -35,6 +35,7 @@ import { LISTS, stagesFor } from "@/lib/constants";
 import { dueLabel, prettyDateTime, todayISO } from "@/lib/dates";
 import type { Labeled, Note, Person, Relationship, Task } from "@/lib/types";
 import { DAY_ONE_TAGS } from "@/lib/constants";
+import { prettyPhone } from "@/lib/format";
 
 export const maxDuration = 30;
 
@@ -80,18 +81,20 @@ const ICON: Record<ContactKind, string> = { phones: "📞", emails: "✉️", ad
 
 function ContactRow({ personId, kind, item, index }: { personId: string; kind: ContactKind; item: Labeled; index: number }) {
   const href = kind === "phones" ? `tel:${item.value}` : kind === "emails" ? `mailto:${item.value}` : null;
+  const shown = kind === "phones" ? prettyPhone(item.value) : item.value;
   return (
-    <li className="flex gap-3">
-      <span className="w-5 shrink-0 text-center">{ICON[kind]}</span>
-      <div className="min-w-0 flex-1">
-        <span className="break-words">
-          {href ? <a className="text-blue-700 hover:underline" href={href}>{item.value}</a> : item.value}
+    <li>
+      <div className="flex items-center gap-2">
+        <span className="w-5 shrink-0 text-center">{ICON[kind]}</span>
+        <span className={`min-w-0 flex-1 ${kind === "addresses" ? "" : "truncate whitespace-nowrap"}`} title={item.value}>
+          {href ? <a className="text-blue-700 hover:underline" href={href}>{shown}</a> : shown}
           {item.label && <span className="text-stone-400"> ({item.label.toLowerCase()})</span>}
         </span>
-        <Edit label={`Edit this ${kind.slice(0, -1)}`} className="inline-block align-middle">
-          <ContactForm personId={personId} kind={kind} index={index} item={item} />
-        </Edit>
+        <EditButton id={`edit-${kind}-${index}`} label={`Edit this ${kind.slice(0, -1)}`} />
       </div>
+      <EditPanel id={`edit-${kind}-${index}`}>
+        <ContactForm personId={personId} kind={kind} index={index} item={item} />
+      </EditPanel>
     </li>
   );
 }
@@ -180,7 +183,7 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
       <Link href={meta.path} className="text-sm text-stone-500 hover:text-charcoal">← Back to {meta.label}</Link>
       {saved && <div className="rounded-2xl border border-green-200 bg-green-50 px-5 py-3 text-green-800">✓ Saved.</div>}
 
-      <div className="grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)_280px]">
+      <div className="grid gap-5 lg:grid-cols-[380px_minmax(0,1fr)_280px]">
         {/* ---------- LEFT: who they are ---------- */}
         <div className="space-y-5">
           <section className="card space-y-4">
@@ -262,36 +265,37 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
             {rels?.length ? (
               <ul className="space-y-4">
                 {rels.map((r) => (
-                  <li key={r.id} className="flex gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-200 text-xs font-bold text-stone-600">{initials(r.name)}</span>
-                    <div className="min-w-0 flex-1 text-[15px]">
-                      <p>
+                  <li key={r.id}>
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-stone-200 text-xs font-bold text-stone-600">{initials(r.name)}</span>
+                      <p className="min-w-0 flex-1 truncate whitespace-nowrap" title={r.name}>
                         <strong>{r.name}</strong>
                         {r.label && <span className="text-stone-500"> ({r.label})</span>}
                       </p>
-                      {r.phone && <p><a className="text-blue-700 hover:underline" href={`tel:${r.phone}`}>📞 {r.phone}</a></p>}
-                      {r.email && <p className="break-words"><a className="text-blue-700 hover:underline" href={`mailto:${r.email}`}>✉️ {r.email}</a></p>}
-                      {r.address && <p className="text-stone-600">🏠 {r.address}</p>}
-                    </div>
-                    <div className="flex items-start gap-1">
-                      <Edit label={`Edit ${r.name}`}>
-                        <form action={editRelationship.bind(null, r.id, person.id)} className="w-56 space-y-2">
-                          <input name="name" defaultValue={r.name} required className="input py-2" />
-                          <select name="label" defaultValue={r.label ?? ""} className="input py-2">
-                            <option value="">(no label)</option>
-                            {r.label && !REL_LABELS.includes(r.label) && <option>{r.label}</option>}
-                            {REL_LABELS.map((l) => <option key={l}>{l}</option>)}
-                          </select>
-                          <input name="phone" defaultValue={r.phone ?? ""} placeholder="Phone" className="input py-2" />
-                          <input name="email" defaultValue={r.email ?? ""} placeholder="Email" className="input py-2" />
-                          <input name="address" defaultValue={r.address ?? ""} placeholder="Address" className="input py-2" />
-                          <SubmitButton className="btn-gold px-3 py-1.5 text-sm">Save</SubmitButton>
-                        </form>
-                      </Edit>
+                      <EditButton id={`edit-rel-${r.id}`} label={`Edit ${r.name}`} />
                       <form action={deleteRelationship.bind(null, r.id, person.id)}>
-                        <ConfirmButton className="px-1 text-stone-400 hover:text-red-600" message={`Remove ${r.name} from this card?`}>🗑️</ConfirmButton>
+                        <ConfirmButton className="rounded-md px-1.5 py-0.5 text-sm text-stone-400 hover:bg-red-50 hover:text-red-600" message={`Remove ${r.name} from this card?`}>🗑️</ConfirmButton>
                       </form>
                     </div>
+                    <div className="ml-10 space-y-0.5 text-[15px]">
+                      {r.phone && <p className="truncate whitespace-nowrap"><a className="text-blue-700 hover:underline" href={`tel:${r.phone}`}>📞 {prettyPhone(r.phone)}</a></p>}
+                      {r.email && <p className="truncate whitespace-nowrap" title={r.email}><a className="text-blue-700 hover:underline" href={`mailto:${r.email}`}>✉️ {r.email}</a></p>}
+                      {r.address && <p className="text-stone-600">🏠 {r.address}</p>}
+                    </div>
+                    <EditPanel id={`edit-rel-${r.id}`}>
+                      <form action={editRelationship.bind(null, r.id, person.id)} className="space-y-2">
+                        <input name="name" defaultValue={r.name} required className="input py-2" />
+                        <select name="label" defaultValue={r.label ?? ""} className="input py-2">
+                          <option value="">(no label)</option>
+                          {r.label && !REL_LABELS.includes(r.label) && <option>{r.label}</option>}
+                          {REL_LABELS.map((l) => <option key={l}>{l}</option>)}
+                        </select>
+                        <input name="phone" defaultValue={r.phone ?? ""} placeholder="Phone" className="input py-2" />
+                        <input name="email" defaultValue={r.email ?? ""} placeholder="Email" className="input py-2" />
+                        <input name="address" defaultValue={r.address ?? ""} placeholder="Address" className="input py-2" />
+                        <SubmitButton className="btn-gold px-3 py-1.5 text-sm">Save</SubmitButton>
+                      </form>
+                    </EditPanel>
                   </li>
                 ))}
               </ul>

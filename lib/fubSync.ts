@@ -104,9 +104,10 @@ export async function syncFromFub(supabase: SupabaseClient, userId: string, peop
     set("email2", f.email2);
     set("address", f.address);
     set("lead_source", f.lead_source);
-    set("phones", f.phones);
-    set("emails", f.emails);
-    set("addresses", f.addresses);
+    // Labeled phones/emails/addresses: fill in the first time; afterwards only when changed in Follow Up Boss
+    (match.phones == null ? setRaw : set)("phones", f.phones);
+    (match.emails == null ? setRaw : set)("emails", f.emails);
+    (match.addresses == null ? setRaw : set)("addresses", f.addresses);
     if (fubChanged && tags.length !== (match.tags ?? []).length) patch.tags = tags;
     if (!match.fub_id) patch.fub_id = p.id;
     // Only change the hub stage when the stage changed in Follow Up Boss, so Steve's own hub changes stick.
