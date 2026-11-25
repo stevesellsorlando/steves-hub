@@ -7,7 +7,7 @@ import { FOLLOW_UPS, LISTS, isListKey, defaultStage, type ListKey } from "@/lib/
 import { addDaysISO, todayISO } from "@/lib/dates";
 import { saveNote } from "@/lib/saveNote";
 import { contactList, flatFields, type ContactKind } from "@/lib/contact";
-import { updateFubNote, fubConfigured } from "@/lib/fub";
+import { updateFubNote, fubConfigured, updateFubTask, deleteFubTask } from "@/lib/fub";
 import type { Person } from "@/lib/types";
 
 function str(fd: FormData, key: string): string | null {
@@ -194,15 +194,32 @@ export async function deletePerson(personId: string, list: ListKey) {
 
 // ---------- To-dos ----------
 
+async function fubTaskId(supabase: Awaited<ReturnType<typeof db>>, taskId: string) {
+  const { data } = await supabase.from("tasks").select("fub_task_id").eq("id", taskId).single();
+  return data?.fub_task_id && fubConfigured() ? Number(data.fub_task_id) : null;
+}
+
 export async function completeTask(taskId: string) {
   const supabase = await db();
   await supabase.from("tasks").update({ done_at: new Date().toISOString() }).eq("id", taskId);
+  const fid = await fubTaskId(supabase, taskId);
+  if (fid) {
+    try {
+      await updateFubTask(fid, { isCompleted: true });
+    } catch {}
+  }
   revalidatePath("/", "layout");
 }
 
 export async function undoTask(taskId: string) {
   const supabase = await db();
   await supabase.from("tasks").update({ done_at: null }).eq("id", taskId);
+  const fid = await fubTaskId(supabase, taskId);
+  if (fid) {
+    try {
+      await updateFubTask(fid, { isCompleted: false });
+    } catch {}
+  }
   revalidatePath("/", "layout");
 }
 
@@ -323,12 +340,26 @@ export async function editTask(taskId: string, personId: string | null, fd: Form
   const due = str(fd, "due_date");
   if (title) patch.title = title;
   if (due) patch.due_date = due;
-  if (Object.keys(patch).length) await supabase.from("tasks").update(patch).eq("id", taskId);
+  if (Object.keys(patch).length) {
+    await supabase.from("tasks").update(patch).eq("id", taskId);
+    const fid = await fubTaskId(supabase, taskId);
+    if (fid) {
+      try {
+        await updateFubTask(fid, { name: title ?? undefined, dueDate: due ?? undefined });
+      } catch {}
+    }
+  }
   revalidatePath("/", "layout");
 }
 
 export async function deleteTask(taskId: string) {
   const supabase = await db();
+  const fid = await fubTaskId(supabase, taskId);
+  if (fid) {
+    try {
+      await deleteFubTask(fid);
+    } catch {}
+  }
   await supabase.from("tasks").delete().eq("id", taskId);
   revalidatePath("/", "layout");
 }

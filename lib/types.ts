@@ -60,5 +60,8 @@ export type Task = {
   type: string;
   due_date: string;
   done_at: string | null;
+  assigned_to?: string | null;
+  due_time?: string | null;
+  fub_task_id?: number | null;
   people?: { name: string; list: ListKey; phone: string | null } | null;
 };
