@@ -3,6 +3,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchAllPeople, type FubPerson } from "./fub";
 import { digits, fubToFields, mapList, mapStage } from "./fubMap";
+import { syncFubTasks } from "./fubTasks";
 
 type Existing = {
   id: string;
@@ -142,11 +143,20 @@ export async function syncFromFub(supabase: SupabaseClient, userId: string, peop
     if (noteRows.length) await supabase.from("notes").insert(noteRows);
   }
 
+  // Tasks too (after people, so tasks can be linked to their cards)
+  let taskNote = "";
+  try {
+    const t = await syncFubTasks(supabase, userId);
+    taskNote = `, ${t.tasks} open tasks`;
+  } catch (e) {
+    taskNote = `, tasks not synced (${e instanceof Error ? e.message : String(e)})`;
+  }
+
   await supabase.from("app_settings").upsert({
     user_id: userId,
     fub_sync_enabled: true,
     fub_last_synced_at: new Date().toISOString(),
-    fub_last_result: `${result.total} people checked: ${result.created} new, ${result.updated} updated, ${result.unchanged} unchanged`,
+    fub_last_result: `${result.total} people checked: ${result.created} new, ${result.updated} updated, ${result.unchanged} unchanged${taskNote}`,
     updated_at: new Date().toISOString(),
   });
   return result;

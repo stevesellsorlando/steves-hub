@@ -162,3 +162,28 @@ export async function sendFubLead(lead: { firstName: string; lastName: string; e
     }),
   });
 }
+
+export type FubTask = {
+  id: number;
+  personId?: number | null;
+  name?: string;
+  type?: string;
+  assignedTo?: string;
+  dueDate?: string;
+  dueDateTime?: string;
+  isCompleted?: boolean | number;
+};
+
+// Every open task Steve's key can see, 100 at a time
+export async function fetchOpenTasks(max = 20000): Promise<FubTask[]> {
+  const all = await allPages<FubTask>(`${BASE}/tasks?isCompleted=false&limit=100`, "tasks", max);
+  return all.filter((t) => !t.isCompleted);
+}
+
+export async function updateFubTask(taskId: number, patch: { isCompleted?: boolean; name?: string; dueDate?: string }) {
+  return fubFetch(`/tasks/${taskId}`, { method: "PUT", body: JSON.stringify(patch) });
+}
+
+export async function deleteFubTask(taskId: number) {
+  return fubFetch(`/tasks/${taskId}`, { method: "DELETE" });
+}

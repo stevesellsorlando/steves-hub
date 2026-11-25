@@ -22,7 +22,9 @@ export function TaskRow({ t }: { t: Task }) {
           <p className="font-medium">{t.title}</p>
         )}
         <p className="text-sm text-stone-500">
-          <span className={overdue ? "text-red-600" : ""}>{dueLabel(t.due_date)}</span>
+          <span className={overdue ? "text-red-600" : ""}>{dueLabel(t.due_date)}{t.due_time ? ` · ${t.due_time}` : ""}</span>
+          {t.assigned_to && <> · 👤 {t.assigned_to}</>}
+          {t.people?.name && !t.title.includes(t.people.name) && <> · {t.people.name}</>}
           {t.people?.phone && <> · <a href={`tel:${t.people.phone}`} className="hover:text-gold-dark">📞 {prettyPhone(t.people.phone)}</a></>}
         </p>
       </div>
