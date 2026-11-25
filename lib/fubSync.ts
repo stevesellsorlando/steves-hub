@@ -19,6 +19,9 @@ type Existing = {
   lead_source: string | null;
   fub_last_activity: string | null;
   fub_notes_synced_at: string | null;
+  phones: unknown;
+  emails: unknown;
+  addresses: unknown;
 };
 
 export type SyncResult = { total: number; created: number; updated: number; unchanged: number };
@@ -31,7 +34,7 @@ export async function syncFromFub(supabase: SupabaseClient, userId: string, peop
   for (let from = 0; ; from += 1000) {
     const { data: rows, error } = await supabase
       .from("people")
-      .select("id, fub_id, fub_stage, list, name, phone, phone2, email, email2, address, tags, lead_source, fub_last_activity, fub_notes_synced_at")
+      .select("id, fub_id, fub_stage, list, name, phone, phone2, email, email2, address, tags, lead_source, fub_last_activity, fub_notes_synced_at, phones, emails, addresses")
       .eq("user_id", userId)
       .order("id")
       .range(from, from + 999);
@@ -97,6 +100,9 @@ export async function syncFromFub(supabase: SupabaseClient, userId: string, peop
     set("email2", f.email2);
     set("address", f.address);
     set("lead_source", f.lead_source);
+    set("phones", f.phones);
+    set("emails", f.emails);
+    set("addresses", f.addresses);
     if (tags.length !== (match.tags ?? []).length) patch.tags = tags;
     if (!match.fub_id) patch.fub_id = p.id;
     // Only change the hub stage when the stage changed in Follow Up Boss, so Steve's own hub changes stick.

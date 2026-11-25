@@ -44,7 +44,7 @@ export default function HubLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       <main className="px-4 pb-28 pt-5 md:ml-60 md:px-10 md:pb-12 md:pt-8">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-7xl">
           <div className="mb-6 hidden md:block">
             <SearchBar />
           </div>

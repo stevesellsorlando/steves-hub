@@ -55,10 +55,20 @@ export function fubToFields(p: FubPerson) {
   const phones = primaryFirst(p.phones).map((x) => x.value).filter(Boolean);
   const emails = primaryFirst(p.emails).map((x) => x.value).filter(Boolean);
   const a = p.addresses?.[0];
-  const address = a ? [a.street, a.city, [a.state, a.code].filter(Boolean).join(" ")].filter(Boolean).join(", ") : null;
+  const address = a ? formatAddress(a) : null;
   const name = (p.name || [p.firstName, p.lastName].filter(Boolean).join(" ")).trim() || `Follow Up Boss #${p.id}`;
+  const labeled = {
+    phones: primaryFirst(p.phones).filter((x) => x.value).map((x) => ({ value: x.value, label: x.type ?? null })),
+    emails: primaryFirst(p.emails).filter((x) => x.value).map((x) => ({ value: x.value, label: x.type ?? null })),
+    addresses: (p.addresses ?? [])
+      .map((x) => ({ value: formatAddress(x), label: x.type ?? null }))
+      .filter((x) => x.value),
+  };
   return {
     name,
+    phones: labeled.phones.length ? labeled.phones : null,
+    emails: labeled.emails.length ? labeled.emails : null,
+    addresses: labeled.addresses.length ? labeled.addresses : null,
     phone: phones[0] ?? null,
     phone2: phones[1] ?? null,
     email: emails[0] ?? null,
@@ -70,3 +80,7 @@ export function fubToFields(p: FubPerson) {
 }
 
 export const digits = (s?: string | null) => (s ?? "").replace(/\D/g, "").slice(-10);
+
+export function formatAddress(a: { street?: string; city?: string; state?: string; code?: string }) {
+  return [a.street, a.city, [a.state, a.code].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+}

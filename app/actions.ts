@@ -214,3 +214,45 @@ export async function addTask(fd: FormData) {
   });
   revalidatePath("/", "layout");
 }
+
+// ---------- Log a call with notes ----------
+
+export async function logCallNote(personId: string, fd: FormData) {
+  const supabase = await db();
+  const what = str(fd, "body");
+  const outcome = str(fd, "outcome");
+  const body = ["Called" + (outcome ? `: ${outcome}` : ""), what].filter(Boolean).join("\n");
+  await saveNote(supabase, personId, "call", body);
+  await supabase.from("people").update({ last_contacted_at: new Date().toISOString() }).eq("id", personId);
+  const due = followUpDate(fd);
+  if (due) {
+    const { data: p } = await supabase.from("people").select("name, list").eq("id", personId).single();
+    if (p) {
+      await supabase.from("tasks").insert({ person_id: personId, title: `Follow up with ${p.name}`, type: LISTS[p.list as ListKey].taskType, due_date: due });
+    }
+  }
+  revalidatePath(`/people/${personId}`);
+}
+
+// ---------- Relationships (spouse, realtor, attorney...) ----------
+
+export async function addRelationship(personId: string, fd: FormData) {
+  const supabase = await db();
+  const name = str(fd, "name");
+  if (!name) return;
+  await supabase.from("relationships").insert({
+    person_id: personId,
+    name,
+    label: str(fd, "label"),
+    phone: str(fd, "phone"),
+    email: str(fd, "email"),
+    address: str(fd, "address"),
+  });
+  revalidatePath(`/people/${personId}`);
+}
+
+export async function deleteRelationship(relId: string, personId: string) {
+  const supabase = await db();
+  await supabase.from("relationships").delete().eq("id", relId);
+  revalidatePath(`/people/${personId}`);
+}

@@ -1,10 +1,10 @@
 // Brings each person's Follow Up Boss notes and call logs onto their hub timeline.
 // Works in batches and remembers where it left off, so it can stop and resume anytime.
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { fetchCalls, fetchEvents, fetchNotes, fetchTexts, type FubCall, type FubEvent, type FubNote, type FubText } from "./fub";
+import { fetchCalls, fetchEvents, fetchNotes, fetchRelationships, fetchTexts, type FubRelationship, type FubCall, type FubEvent, type FubNote, type FubText } from "./fub";
 
 // Anyone whose notes were brought over before texts and history were added gets one more pass.
-const FORMAT_SINCE = "2026-11-23T16:20:00Z";
+const FORMAT_SINCE = "2026-11-25T14:00:00Z"; // bumped when relationships were added
 const WAITING = `fub_notes_synced_at.is.null,fub_notes_synced_at.lt.${FORMAT_SINCE}`;
 
 const strip = (html: string) =>
@@ -87,6 +87,23 @@ export async function importNotesBatch(supabase: SupabaseClient, userId: string,
             fetchTexts(id).catch(() => []),
             fetchEvents(id).catch(() => []),
           ]);
+          const rels: FubRelationship[] = await fetchRelationships(id).catch(() => []);
+          if (rels.length) {
+            const relRows = rels.map((r) => {
+              const a = r.addresses?.[0];
+              return {
+                user_id: userId,
+                person_id: p.id,
+                fub_rel_id: r.id,
+                label: r.type ?? null,
+                name: (r.name || [r.firstName, r.lastName].filter(Boolean).join(" ")).trim() || "Unnamed",
+                phone: r.phones?.[0]?.value ?? null,
+                email: r.emails?.[0]?.value ?? null,
+                address: a ? [a.street, a.city, [a.state, a.code].filter(Boolean).join(" ")].filter(Boolean).join(", ") : null,
+              };
+            });
+            await supabase.from("relationships").upsert(relRows, { onConflict: "user_id,fub_rel_id" });
+          }
           const rows = [
             ...notes.map((n) => noteRow(userId, p.id, n)).filter(Boolean),
             ...calls.map((c) => callRow(userId, p.id, c)),
