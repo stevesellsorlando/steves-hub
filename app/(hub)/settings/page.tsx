@@ -149,7 +149,7 @@ async function CalendarPicker() {
   try {
     cals = await listCalendars(await calendarToken(supabase, user.id));
   } catch {
-    return <p className="text-sm text-stone-500">Couldn&apos;t load your calendars. Try “Reconnect Google.”</p>;
+    return <p className="text-sm text-stone-500">Couldn&apos;t load your calendars right now. Refresh this page in a moment.</p>;
   }
   const { data: g } = await supabase.from("google_accounts").select("shown_calendars").maybeSingle();
   const picked: string[] | null = g?.shown_calendars ?? null;

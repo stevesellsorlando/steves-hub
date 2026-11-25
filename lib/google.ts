@@ -38,17 +38,23 @@ export function redirectUri(origin: string) {
   return `${origin}/api/google/callback`;
 }
 
-export function authUrl(origin: string, state: string) {
+export function authUrl(origin: string, state: string, hintEmail?: string | null) {
   const p = new URLSearchParams({
     client_id: CLIENT_ID(),
     redirect_uri: redirectUri(origin),
     response_type: "code",
     scope: GOOGLE_SCOPES.join(" "),
     access_type: "offline",
-    prompt: "consent",
+    prompt: "select_account consent",
     include_granted_scopes: "true",
     state,
   });
+  // When reconnecting, steer Google to the work account already connected
+  if (hintEmail) {
+    p.set("login_hint", hintEmail);
+    const domain = hintEmail.split("@")[1];
+    if (domain && !/^(gmail|googlemail)\.com$/i.test(domain)) p.set("hd", domain);
+  }
   return `https://accounts.google.com/o/oauth2/v2/auth?${p}`;
 }
 

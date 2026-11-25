@@ -14,8 +14,9 @@ export async function GET(request: NextRequest) {
   if (!user) return NextResponse.redirect(new URL("/login", request.url));
   if (!googleConfigured()) return NextResponse.redirect(new URL("/settings?msg=Google+keys+are+missing+in+Vercel", request.url));
 
+  const { data: g } = await supabase.from("google_accounts").select("email").maybeSingle();
   const state = randomBytes(16).toString("hex");
-  const res = NextResponse.redirect(authUrl(request.nextUrl.origin, state));
+  const res = NextResponse.redirect(authUrl(request.nextUrl.origin, state, g?.email));
   res.cookies.set("g_state", state, { httpOnly: true, secure: true, sameSite: "lax", maxAge: 600, path: "/" });
   return res;
 }
