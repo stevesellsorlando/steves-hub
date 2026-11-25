@@ -7,7 +7,15 @@ import {
   completeTask,
   deletePerson,
   deleteRelationship,
+  deleteTask,
+  editContact,
+  editNote,
+  editRelationship,
+  editTask,
+  hideNote,
   logCallNote,
+  renamePerson,
+  setTags,
   logTouch,
   moveToClients,
   setFollowUp,
@@ -19,11 +27,14 @@ import { MicButton } from "@/components/MicButton";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ConfirmButton } from "@/components/ConfirmButton";
 import { Tabs } from "@/components/Tabs";
+import { Edit } from "@/components/Edit";
+import { contactList, type ContactKind } from "@/lib/contact";
 import { DetailsForm } from "./DetailsForm";
 import { gmailForPerson } from "@/lib/personEmails";
 import { LISTS, stagesFor } from "@/lib/constants";
 import { dueLabel, prettyDateTime, todayISO } from "@/lib/dates";
 import type { Labeled, Note, Person, Relationship, Task } from "@/lib/types";
+import { DAY_ONE_TAGS } from "@/lib/constants";
 
 export const maxDuration = 30;
 
@@ -39,7 +50,7 @@ const FILTERS = [
 ] as const;
 type FilterKey = (typeof FILTERS)[number]["key"];
 
-type Item = { key: string; type: Exclude<FilterKey, "all">; date: string; title?: string; body: string; who?: string; link?: string };
+type Item = { key: string; type: Exclude<FilterKey, "all">; date: string; title?: string; body: string; who?: string; link?: string; noteId?: string };
 
 function ago(iso: string | null) {
   if (!iso) return "never";
@@ -60,23 +71,55 @@ const initials = (name: string) =>
     .map((w) => w[0]?.toUpperCase())
     .join("");
 
-// Labeled entries from Follow Up Boss, plus anything typed into the card's own fields
-function labeled(list: Labeled[] | null | undefined, fallback: (string | null)[]): Labeled[] {
-  const out = [...(list ?? [])];
-  const norm = (v: string) => v.replace(/[^a-z0-9]/gi, "").toLowerCase();
-  for (const v of fallback) if (v && !out.some((o) => norm(o.value) === norm(v))) out.push({ value: v, label: null });
-  return out;
-}
+const LABELS: Record<ContactKind, string[]> = {
+  phones: ["mobile", "home", "work", "other"],
+  emails: ["personal", "work", "other"],
+  addresses: ["home", "work", "mailing", "property", "other"],
+};
+const ICON: Record<ContactKind, string> = { phones: "📞", emails: "✉️", addresses: "🏠" };
 
-function Row({ icon, children, label }: { icon: string; children: React.ReactNode; label?: string | null }) {
+function ContactRow({ personId, kind, item, index }: { personId: string; kind: ContactKind; item: Labeled; index: number }) {
+  const href = kind === "phones" ? `tel:${item.value}` : kind === "emails" ? `mailto:${item.value}` : null;
   return (
     <li className="flex gap-3">
-      <span className="w-5 shrink-0 text-center">{icon}</span>
-      <span className="min-w-0 break-words">
-        {children}
-        {label && <span className="text-stone-400"> ({label.toLowerCase()})</span>}
-      </span>
+      <span className="w-5 shrink-0 text-center">{ICON[kind]}</span>
+      <div className="min-w-0 flex-1">
+        <span className="break-words">
+          {href ? <a className="text-blue-700 hover:underline" href={href}>{item.value}</a> : item.value}
+          {item.label && <span className="text-stone-400"> ({item.label.toLowerCase()})</span>}
+        </span>
+        <Edit label={`Edit this ${kind.slice(0, -1)}`} className="inline-block align-middle">
+          <ContactForm personId={personId} kind={kind} index={index} item={item} />
+        </Edit>
+      </div>
     </li>
+  );
+}
+
+function ContactForm({ personId, kind, index, item }: { personId: string; kind: ContactKind; index: number; item?: Labeled }) {
+  const label = item?.label?.toLowerCase() ?? "";
+  return (
+    <form action={editContact.bind(null, personId, kind, index)} className="space-y-2">
+      <input
+        name="value"
+        defaultValue={item?.value ?? ""}
+        required
+        type={kind === "emails" ? "email" : kind === "phones" ? "tel" : "text"}
+        placeholder={kind === "phones" ? "Phone" : kind === "emails" ? "Email" : "Address"}
+        className="input py-2"
+      />
+      <select name="label" defaultValue={label} className="input py-2">
+        <option value="">(no label)</option>
+        {label && !LABELS[kind].includes(label) && <option>{label}</option>}
+        {LABELS[kind].map((l) => <option key={l}>{l}</option>)}
+      </select>
+      <div className="flex gap-2">
+        <SubmitButton className="btn-gold px-3 py-1.5 text-sm">Save</SubmitButton>
+        {index >= 0 && (
+          <button name="op" value="delete" className="btn-light px-3 py-1.5 text-sm text-red-700">Delete</button>
+        )}
+      </div>
+    </form>
   );
 }
 
@@ -89,12 +132,12 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
   const { data: person } = await supabase.from("people").select("*").eq("id", id).single<Person>();
   if (!person) notFound();
 
-  const phones = labeled(person.phones, [person.phone, person.phone2]);
-  const emails = labeled(person.emails, [person.email, person.email2]);
-  const addresses = labeled(person.addresses, [person.address, person.list !== "client" ? person.property_address : null]);
+  const phones = contactList(person, "phones");
+  const emails = contactList(person, "emails");
+  const addresses = contactList(person, "addresses");
 
   const [{ data: notes }, { data: tasks }, { data: rels }, { data: sentByHub }, gmail] = await Promise.all([
-    supabase.from("notes").select("*").eq("person_id", id).order("created_at", { ascending: false }).returns<Note[]>(),
+    supabase.from("notes").select("*").eq("person_id", id).not("hidden", "is", true).order("created_at", { ascending: false }).returns<Note[]>(),
     supabase.from("tasks").select("*").eq("person_id", id).is("done_at", null).order("due_date").returns<Task[]>(),
     supabase.from("relationships").select("*").eq("person_id", id).order("created_at").returns<Relationship[]>(),
     supabase.from("outbox").select("gmail_message_id").eq("person_id", id).eq("status", "sent"),
@@ -109,6 +152,7 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
   const items: Item[] = [
     ...(notes ?? []).map((n) => ({
       key: n.id,
+      noteId: n.id,
       type: (n.kind === "note" && n.body.startsWith("History:") ? "history" : n.kind) as Item["type"],
       date: n.created_at,
       body: n.body,
@@ -143,7 +187,15 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
             <div className="flex items-center gap-3">
               <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gold/80 text-lg font-bold text-charcoal">{initials(person.name)}</span>
               <div className="min-w-0">
-                <h1 className="break-words text-xl font-bold leading-tight">{person.name}</h1>
+                <div className="flex items-start gap-1">
+                  <h1 className="break-words text-xl font-bold leading-tight">{person.name}</h1>
+                  <Edit label="Edit name">
+                    <form action={renamePerson.bind(null, person.id)} className="space-y-2">
+                      <input name="name" defaultValue={person.name} required className="input py-2" />
+                      <SubmitButton className="btn-gold px-3 py-1.5 text-sm">Save</SubmitButton>
+                    </form>
+                  </Edit>
+                </div>
                 <p className="text-sm text-stone-500">Last contact {ago(person.last_contacted_at)}</p>
               </div>
             </div>
@@ -160,26 +212,39 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
             </div>
 
             <ul className="space-y-2 text-[15px]">
-              {phones.map((p) => (
-                <Row key={`p${p.value}`} icon="📞" label={p.label}><a className="text-blue-700 hover:underline" href={`tel:${p.value}`}>{p.value}</a></Row>
-              ))}
-              {emails.map((e) => (
-                <Row key={`e${e.value}`} icon="✉️" label={e.label}><a className="text-blue-700 hover:underline" href={`mailto:${e.value}`}>{e.value}</a></Row>
-              ))}
-              {addresses.map((a) => (
-                <Row key={`a${a.value}`} icon="🏠" label={a.label}>{a.value}</Row>
-              ))}
+              {phones.map((p, i) => <ContactRow key={`p${i}${p.value}`} personId={person.id} kind="phones" item={p} index={i} />)}
+              {emails.map((e, i) => <ContactRow key={`e${i}${e.value}`} personId={person.id} kind="emails" item={e} index={i} />)}
+              {addresses.map((a, i) => <ContactRow key={`a${i}${a.value}`} personId={person.id} kind="addresses" item={a} index={i} />)}
               {person.list !== "client" && person.property_address && !addresses.some((a) => a.value === person.property_address) && (
-                <Row icon="🏚️" label="property">{person.property_address}</Row>
+                <li className="flex gap-3"><span className="w-5 shrink-0 text-center">🏚️</span><span>{person.property_address} <span className="text-stone-400">(property)</span></span></li>
               )}
-              {!phones.length && !emails.length && !addresses.length && <li className="text-stone-400">No contact info yet. Add it under Details below.</li>}
+              {!phones.length && !emails.length && !addresses.length && <li className="text-stone-400">No contact info yet.</li>}
             </ul>
+            <div className="flex flex-wrap gap-2 text-sm">
+              {(["phones", "emails", "addresses"] as ContactKind[]).map((k) => (
+                <details key={k} className="w-full">
+                  <summary className="cursor-pointer text-gold-dark hover:underline">+ Add {k === "phones" ? "phone" : k === "emails" ? "email" : "address"}</summary>
+                  <div className="mt-2 rounded-xl border border-gold/40 bg-amber-50/60 p-3">
+                    <ContactForm personId={person.id} kind={k} index={-1} />
+                  </div>
+                </details>
+              ))}
+            </div>
 
-            {person.tags?.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {person.tags.map((tag) => <span key={tag} className="chip border-stone-200 bg-stone-50 py-1 text-xs">🏷️ {tag}</span>)}
-              </div>
-            )}
+            <div className="flex flex-wrap items-center gap-1.5">
+              {person.tags?.length ? (
+                person.tags.map((tag) => <span key={tag} className="chip border-stone-200 bg-stone-50 py-1 text-xs">🏷️ {tag}</span>)
+              ) : (
+                <span className="text-sm text-stone-400">No tags</span>
+              )}
+              <Edit label="Edit tags">
+                <form action={setTags.bind(null, person.id)} className="space-y-2">
+                  <input name="tags" defaultValue={(person.tags ?? []).join(", ")} className="input py-2" placeholder="Tags, separated by commas" />
+                  <p className="text-xs text-stone-500">Ideas: {DAY_ONE_TAGS.join(" · ")}</p>
+                  <SubmitButton className="btn-gold px-3 py-1.5 text-sm">Save tags</SubmitButton>
+                </form>
+              </Edit>
+            </div>
 
             <div className="flex flex-wrap gap-2">
               <form action={logTouch.bind(null, person.id, "call")}><SubmitButton className="btn-dark px-3 py-2 text-sm">📞 Called</SubmitButton></form>
@@ -208,9 +273,25 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
                       {r.email && <p className="break-words"><a className="text-blue-700 hover:underline" href={`mailto:${r.email}`}>✉️ {r.email}</a></p>}
                       {r.address && <p className="text-stone-600">🏠 {r.address}</p>}
                     </div>
-                    <form action={deleteRelationship.bind(null, r.id, person.id)}>
-                      <ConfirmButton className="text-stone-400 hover:text-red-600" message={`Remove ${r.name} from this card?`}>✕</ConfirmButton>
-                    </form>
+                    <div className="flex items-start gap-1">
+                      <Edit label={`Edit ${r.name}`}>
+                        <form action={editRelationship.bind(null, r.id, person.id)} className="w-56 space-y-2">
+                          <input name="name" defaultValue={r.name} required className="input py-2" />
+                          <select name="label" defaultValue={r.label ?? ""} className="input py-2">
+                            <option value="">(no label)</option>
+                            {r.label && !REL_LABELS.includes(r.label) && <option>{r.label}</option>}
+                            {REL_LABELS.map((l) => <option key={l}>{l}</option>)}
+                          </select>
+                          <input name="phone" defaultValue={r.phone ?? ""} placeholder="Phone" className="input py-2" />
+                          <input name="email" defaultValue={r.email ?? ""} placeholder="Email" className="input py-2" />
+                          <input name="address" defaultValue={r.address ?? ""} placeholder="Address" className="input py-2" />
+                          <SubmitButton className="btn-gold px-3 py-1.5 text-sm">Save</SubmitButton>
+                        </form>
+                      </Edit>
+                      <form action={deleteRelationship.bind(null, r.id, person.id)}>
+                        <ConfirmButton className="px-1 text-stone-400 hover:text-red-600" message={`Remove ${r.name} from this card?`}>🗑️</ConfirmButton>
+                      </form>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -300,6 +381,21 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
                         )
                       )}
                       <p className="whitespace-pre-wrap text-[15px]">{i.body}</p>
+                      {i.noteId ? (
+                        <div className="mt-1 flex items-start gap-1">
+                          <Edit label="Edit">
+                            <form action={editNote.bind(null, i.noteId, person.id)} className="space-y-2">
+                              <textarea name="body" defaultValue={i.body} rows={4} className="input" />
+                              <SubmitButton className="btn-gold px-3 py-1.5 text-sm">Save</SubmitButton>
+                            </form>
+                          </Edit>
+                          <form action={hideNote.bind(null, i.noteId, person.id)}>
+                            <ConfirmButton className="rounded-md px-1.5 py-0.5 text-sm text-stone-400 hover:bg-red-50 hover:text-red-600" message="Delete this from the timeline?">🗑️</ConfirmButton>
+                          </form>
+                        </div>
+                      ) : (
+                        <p className="mt-1 text-xs text-stone-400">From your Gmail · change it in Gmail</p>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -321,9 +417,19 @@ export default async function PersonPage({ params, searchParams }: { params: Pro
                     <form action={completeTask.bind(null, t.id)}>
                       <SubmitButton className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-stone-300 text-xs text-transparent hover:border-gold hover:text-gold" pendingText="✓">✓</SubmitButton>
                     </form>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="font-medium">{t.title}</p>
                       <p className={`text-sm ${t.due_date < today ? "text-red-600" : "text-stone-500"}`}>{dueLabel(t.due_date)}</p>
+                      <Edit label="Edit follow-up">
+                        <form action={editTask.bind(null, t.id, person.id)} className="space-y-2">
+                          <input name="title" defaultValue={t.title} required className="input py-2" />
+                          <input name="due_date" type="date" defaultValue={t.due_date} className="input py-2" />
+                          <div className="flex gap-2">
+                            <SubmitButton className="btn-gold px-3 py-1.5 text-sm">Save</SubmitButton>
+                            <button formAction={deleteTask.bind(null, t.id)} className="btn-light px-3 py-1.5 text-sm text-red-700">Delete</button>
+                          </div>
+                        </form>
+                      </Edit>
                     </div>
                   </li>
                 ))}

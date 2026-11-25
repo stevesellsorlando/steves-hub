@@ -29,3 +29,6 @@ create policy "own relationships" on public.relationships for all to authenticat
 
 grant select, insert, update, delete on public.relationships to authenticated;
 grant all on public.relationships to service_role;
+
+-- Notes you delete in the hub are hidden (not erased), so a later Follow Up Boss import can't bring them back
+alter table public.notes add column if not exists hidden boolean not null default false;

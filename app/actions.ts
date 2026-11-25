@@ -6,6 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 import { FOLLOW_UPS, LISTS, isListKey, defaultStage, type ListKey } from "@/lib/constants";
 import { addDaysISO, todayISO } from "@/lib/dates";
 import { saveNote } from "@/lib/saveNote";
+import { contactList, flatFields, type ContactKind } from "@/lib/contact";
+import { updateFubNote, fubConfigured } from "@/lib/fub";
+import type { Person } from "@/lib/types";
 
 function str(fd: FormData, key: string): string | null {
   const v = fd.get(key);
@@ -254,5 +257,89 @@ export async function addRelationship(personId: string, fd: FormData) {
 export async function deleteRelationship(relId: string, personId: string) {
   const supabase = await db();
   await supabase.from("relationships").delete().eq("id", relId);
+  revalidatePath(`/people/${personId}`);
+}
+
+// ---------- Edit buttons (✏️) on the card ----------
+
+export async function renamePerson(personId: string, fd: FormData) {
+  const supabase = await db();
+  const name = str(fd, "name");
+  if (name) await supabase.from("people").update({ name }).eq("id", personId);
+  revalidatePath(`/people/${personId}`);
+}
+
+// op: "save" changes item #index (or adds when index is -1), "delete" removes it
+export async function editContact(personId: string, kind: ContactKind, index: number, fd: FormData) {
+  const supabase = await db();
+  const { data: p } = await supabase.from("people").select("*").eq("id", personId).single<Person>();
+  if (!p) return;
+  const list = contactList(p, kind);
+  if (fd.get("op") === "delete") {
+    if (index >= 0) list.splice(index, 1);
+  } else {
+    const value = str(fd, "value");
+    if (!value) return;
+    const item = { value, label: str(fd, "label") };
+    if (index >= 0 && index < list.length) list[index] = item;
+    else list.push(item);
+  }
+  await supabase.from("people").update(flatFields(kind, list)).eq("id", personId);
+  revalidatePath(`/people/${personId}`);
+}
+
+export async function setTags(personId: string, fd: FormData) {
+  const supabase = await db();
+  const tags = (str(fd, "tags") ?? "").split(",").map((t) => t.trim()).filter(Boolean);
+  await supabase.from("people").update({ tags: Array.from(new Set(tags)) }).eq("id", personId);
+  revalidatePath(`/people/${personId}`);
+}
+
+export async function editNote(noteId: string, personId: string, fd: FormData) {
+  const supabase = await db();
+  const body = str(fd, "body");
+  if (!body) return;
+  const { data: n } = await supabase.from("notes").update({ body }).eq("id", noteId).select("fub_note_id").single();
+  // Notes that also live in Follow Up Boss get the same change there
+  const m = n?.fub_note_id?.match(/^note-(\d+)$/);
+  if (m && fubConfigured()) {
+    try {
+      await updateFubNote(Number(m[1]), body);
+    } catch {}
+  }
+  revalidatePath(`/people/${personId}`);
+}
+
+export async function hideNote(noteId: string, personId: string) {
+  const supabase = await db();
+  await supabase.from("notes").update({ hidden: true }).eq("id", noteId);
+  revalidatePath(`/people/${personId}`);
+}
+
+export async function editTask(taskId: string, personId: string | null, fd: FormData) {
+  const supabase = await db();
+  const patch: Record<string, unknown> = {};
+  const title = str(fd, "title");
+  const due = str(fd, "due_date");
+  if (title) patch.title = title;
+  if (due) patch.due_date = due;
+  if (Object.keys(patch).length) await supabase.from("tasks").update(patch).eq("id", taskId);
+  revalidatePath("/", "layout");
+}
+
+export async function deleteTask(taskId: string) {
+  const supabase = await db();
+  await supabase.from("tasks").delete().eq("id", taskId);
+  revalidatePath("/", "layout");
+}
+
+export async function editRelationship(relId: string, personId: string, fd: FormData) {
+  const supabase = await db();
+  const name = str(fd, "name");
+  if (!name) return;
+  await supabase
+    .from("relationships")
+    .update({ name, label: str(fd, "label"), phone: str(fd, "phone"), email: str(fd, "email"), address: str(fd, "address") })
+    .eq("id", relId);
   revalidatePath(`/people/${personId}`);
 }

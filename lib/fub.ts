@@ -138,3 +138,7 @@ export type FubRelationship = {
 export function fetchRelationships(personId: number) {
   return allPages<FubRelationship>(`${BASE}/peopleRelationships?personId=${personId}&limit=100`, ["peoplerelationships", "peopleRelationships", "relationships"]);
 }
+
+export async function updateFubNote(fubNoteId: number, body: string) {
+  return fubFetch(`/notes/${fubNoteId}`, { method: "PUT", body: JSON.stringify({ body }) });
+}
